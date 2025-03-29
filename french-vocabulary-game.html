@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English-French Language Vocabulary Matcher</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background-color: #58cc02;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 90%;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+            padding: 0 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            margin: 5px;
+        }
+        
+        .control-group label {
+            margin-right: 5px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .select-input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #e1e1e1;
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .column {
+            margin: 0 20px;
+            width: 45%;
+            max-width: 400px;
+        }
+        
+        .column-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1cb0f6;
+            font-size: 18px;
+        }
+
+        .card {
+            background-color: white;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            word-break: break-word;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.selected {
+            background-color: #84d8ff;
+            border-color: #1cb0f6;
+            color: #1cb0f6;
+        }
+
+        .card.match {
+            background-color: #d7ffb8;
+            border-color: #58cc02;
+            color: #58cc02;
+        }
+        
+        .card.incorrect {
+            background-color: #ffb8b8;
+            border-color: #ff4b4b;
+            color: #ff4b4b;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .card.fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .stats-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1cb0f6;
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            width: 80%;
+            max-width: 400px;
+            margin-top: 20px;
+            background-color: #e1e1e1;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #58cc02;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .btn {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #58cc02;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #46a302;
+        }
+        
+        .btn.secondary {
+            background-color: #1cb0f6;
+        }
+        
+        .btn.secondary:hover {
+            background-color: #0e9cd1;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .column {
+                width: 90%;
+                margin: 10px 0;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-group label {
+                margin-bottom: 5px;
+            }
+            
+            .select-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="header-title">English - French Vocabulary Matcher</h1>
+    </header>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="category-select">Vocabulary Category:</label>
+            <select id="category-select" class="select-input">
+                <!-- Category options will be dynamically generated -->
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="difficulty-select">Difficulty:</label>
+            <select id="difficulty-select" class="select-input">
+                <option value="5">Easy (5 pairs)</option>
+                <option value="10" selected>Medium (10 pairs)</option>
+                <option value="15">Hard (15 pairs)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="column">
+            <div id="source-column-header" class="column-header">English</div>
+            <div id="source-column"></div>
+        </div>
+        <div class="column">
+            <div id="target-column-header" class="column-header">French</div>
+            <div id="target-column"></div>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-label">Matched Pairs</div>
+            <div id="matched-counter" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Total Score</div>
+            <div id="score" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Attempts</div>
+            <div id="attempts" class="stat-value">0</div>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="button-container">
+        <button class="btn" id="new-words-btn">New Words</button>
+        <button class="btn secondary" id="reset-score-btn">Reset Score</button>
+    </div>
+
+    <script>
+        // Language data structure with vocabulary organized by category
+        const languageData = {
+            // Language pair
+            languagePair: {
+                "english-french": {
+                    name: "English - French",
+                    sourceLanguage: "english",
+                    targetLanguage: "french",
+                    sourceColumnLabel: "English",
+                    targetColumnLabel: "French"
+                }
+            },
+            
+            // Vocabulary categories
+            categories: {
+                "basics": {
+                    name: "Basics",
+                    vocabulary: [
+                        { english: "hello", french: "bonjour" },
+                        { english: "goodbye", french: "au revoir" },
+                        { english: "please", french: "s'il vous plaît" },
+                        { english: "thank you", french: "merci" },
+                        { english: "yes", french: "oui" },
+                        { english: "no", french: "non" },
+                        { english: "sorry", french: "désolé" },
+                        { english: "excuse me", french: "excusez-moi" },
+                        { english: "good morning", french: "bonjour" },
+                        { english: "good evening", french: "bonsoir" },
+                        { english: "good night", french: "bonne nuit" },
+                        { english: "how are you", french: "comment allez-vous" },
+                        { english: "I am fine", french: "je vais bien" },
+                        { english: "what", french: "quoi" },
+                        { english: "who", french: "qui" },
+                        { english: "when", french: "quand" },
+                        { english: "where", french: "où" },
+                        { english: "why", french: "pourquoi" },
+                        { english: "how", french: "comment" },
+                        { english: "and", french: "et" }
+                    ]
+                },
+                "food": {
+                    name: "Food & Drinks",
+                    vocabulary: [
+                        { english: "apple", french: "pomme" },
+                        { english: "banana", french: "banane" },
+                        { english: "bread", french: "pain" },
+                        { english: "cheese", french: "fromage" },
+                        { english: "chicken", french: "poulet" },
+                        { english: "coffee", french: "café" },
+                        { english: "egg", french: "œuf" },
+                        { english: "fish", french: "poisson" },
+                        { english: "juice", french: "jus" },
+                        { english: "meat", french: "viande" },
+                        { english: "milk", french: "lait" },
+                        { english: "orange", french: "orange" },
+                        { english: "pasta", french: "pâtes" },
+                        { english: "potato", french: "pomme de terre" },
+                        { english: "rice", french: "riz" },
+                        { english: "salad", french: "salade" },
+                        { english: "soup", french: "soupe" },
+                        { english: "tea", french: "thé" },
+                        { english: "water", french: "eau" },
+                        { english: "wine", french: "vin" }
+                    ]
+                },
+                "colors": {
+                    name: "Colors",
+                    vocabulary: [
+                        { english: "black", french: "noir" },
+                        { english: "blue", french: "bleu" },
+                        { english: "brown", french: "marron" },
+                        { english: "gray", french: "gris" },
+                        { english: "green", french: "vert" },
+                        { english: "orange", french: "orange" },
+                        { english: "pink", french: "rose" },
+                        { english: "purple", french: "violet" },
+                        { english: "red", french: "rouge" },
+                        { english: "white", french: "blanc" },
+                        { english: "yellow", french: "jaune" },
+                        { english: "dark blue", french: "bleu foncé" },
+                        { english: "light blue", french: "bleu clair" },
+                        { english: "dark green", french: "vert foncé" },
+                        { english: "light green", french: "vert clair" }
+                    ]
+                },
+                "body": {
+                    name: "Body Parts",
+                    vocabulary: [
+                        { english: "arm", french: "bras" },
+                        { english: "back", french: "dos" },
+                        { english: "ear", french: "oreille" },
+                        { english: "eye", french: "œil" },
+                        { english: "face", french: "visage" },
+                        { english: "finger", french: "doigt" },
+                        { english: "foot", french: "pied" },
+                        { english: "hair", french: "cheveux" },
+                        { english: "hand", french: "main" },
+                        { english: "head", french: "tête" },
+                        { english: "heart", french: "cœur" },
+                        { english: "leg", french: "jambe" },
+                        { english: "mouth", french: "bouche" },
+                        { english: "neck", french: "cou" },
+                        { english: "nose", french: "nez" },
+                        { english: "shoulder", french: "épaule" },
+                        { english: "skin", french: "peau" },
+                        { english: "stomach", french: "estomac" },
+                        { english: "teeth", french: "dents" },
+                        { english: "tongue", french: "langue" }
+                    ]
+                },
+                "time": {
+                    name: "Time & Days",
+                    vocabulary: [
+                        { english: "Monday", french: "lundi" },
+                        { english: "Tuesday", french: "mardi" },
+                        { english: "Wednesday", french: "mercredi" },
+                        { english: "Thursday", french: "jeudi" },
+                        { english: "Friday", french: "vendredi" },
+                        { english: "Saturday", french: "samedi" },
+                        { english: "Sunday", french: "dimanche" },
+                        { english: "day", french: "jour" },
+                        { english: "week", french: "semaine" },
+                        { english: "month", french: "mois" },
+                        { english: "year", french: "année" },
+                        { english: "morning", french: "matin" },
+                        { english: "afternoon", french: "après-midi" },
+                        { english: "evening", french: "soir" },
+                        { english: "night", french: "nuit" },
+                        { english: "time", french: "temps" },
+                        { english: "hour", french: "heure" },
+                        { english: "minute", french: "minute" },
+                        { english: "second", french: "seconde" },
+                        { english: "today", french: "aujourd'hui" }
+                    ]
+                },
+                "nature": {
+                    name: "Nature & Weather",
+                    vocabulary: [
+                        { english: "sun", french: "soleil" },
+                        { english: "moon", french: "lune" },
+                        { english: "star", french: "étoile" },
+                        { english: "sky", french: "ciel" },
+                        { english: "cloud", french: "nuage" },
+                        { english: "rain", french: "pluie" },
+                        { english: "snow", french: "neige" },
+                        { english: "wind", french: "vent" },
+                        { english: "storm", french: "tempête" },
+                        { english: "tree", french: "arbre" },
+                        { english: "flower", french: "fleur" },
+                        { english: "grass", french: "herbe" },
+                        { english: "mountain", french: "montagne" },
+                        { english: "sea", french: "mer" },
+                        { english: "river", french: "rivière" },
+                        { english: "lake", french: "lac" },
+                        { english: "forest", french: "forêt" },
+                        { english: "beach", french: "plage" },
+                        { english: "earth", french: "terre" },
+                        { english: "fire", french: "feu" }
+                    ]
+                }
+            }
+        };
+
+        // Game state variables
+        let currentPairs = [];
+        let totalPairs = 10;
+        let matchedPairs = 0;
+        let selectedCards = [];
+        let totalScore = 0;
+        let attempts = 0;
+        let isProcessing = false;
+        let currentCategory = 'basics';
+
+        // DOM elements
+        const sourceColumn = document.getElementById('source-column');
+        const targetColumn = document.getElementById('target-column');
+        const sourceColumnHeader = document.getElementById('source-column-header');
+        const targetColumnHeader = document.getElementById('target-column-header');
+        const matchedCounter = document.getElementById('matched-counter');
+        const scoreElement = document.getElementById('score');
+        const attemptsElement = document.getElementById('attempts');
+        const progressBar = document.getElementById('progress-bar');
+        const newWordsBtn = document.getElementById('new-words-btn');
+        const resetScoreBtn = document.getElementById('reset-score-btn');
+        const categorySelect = document.getElementById('category-select');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const headerTitle = document.getElementById('header-title');
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Select random pairs from the vocabulary
+        function selectRandomPairs() {
+            // Create a copy of the current vocabulary array
+            const shuffled = [...languageData.categories[currentCategory].vocabulary];
+            // Shuffle the array
+            shuffleArray(shuffled);
+            // Take the first 'totalPairs' elements or as many as available
+            return shuffled.slice(0, Math.min(totalPairs, shuffled.length));
+        }
+        
+        // Generate category select options
+        function populateCategorySelect() {
+            categorySelect.innerHTML = '';
+            
+            // Create an option for each category
+            Object.keys(languageData.categories).forEach(categoryKey => {
+                const option = document.createElement('option');
+                option.value = categoryKey;
+                option.textContent = languageData.categories[categoryKey].name;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Create and display the game cards
+        function createGameCards() {
+            // Clear the columns
+            sourceColumn.innerHTML = '';
+            targetColumn.innerHTML = '';
+            
+            // Select random pairs
+            currentPairs = selectRandomPairs();
+            
+            // Create source language cards (left column)
+            const sourceWords = currentPairs.map(pair => pair.english);
+            shuffleArray(sourceWords).forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = word;
+                card.dataset.value = word;
+                card.dataset.language = 'english';
+                card.addEventListener('click', handleCardClick);
+                sourceColumn.appendChild(card);
+            });
+            
+            // Create target language cards (right column)
+            const targetWords = currentPairs.map(pair => pair.french);
+            shuffleArray(targetWords).forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = word;
+                card.dataset.value = word;
+                card.dataset.language = 'french';
+                card.addEventListener('click', handleCardClick);
+                targetColumn.appendChild(card);
+            });
+        }
+
+        // Handle card click events
+        function handleCardClick(event) {
+            if (isProcessing) return;
+            
+            const card = event.target;
+            
+            // Don't allow clicking already matched cards or the same card twice
+            if (card.classList.contains('match') || selectedCards.includes(card)) {
+                return;
+            }
+            
+            // Mark card as selected
+            card.classList.add('selected');
+            selectedCards.push(card);
+            
+            // If we have selected two cards, check for a match
+            if (selectedCards.length === 2) {
+                isProcessing = true;
+                checkForMatch();
+            }
+        }
+
+        // Check if the selected cards form a matching pair
+        function checkForMatch() {
+            const [card1, card2] = selectedCards;
+            
+            // Cards must be from different languages
+            if (card1.dataset.language === card2.dataset.language) {
+                // Not a valid selection
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                    selectedCards = [];
+                    isProcessing = false;
+                }, 1000);
+                return;
+            }
+            
+            // Count this as an attempt
+            attempts++;
+            attemptsElement.textContent = attempts;
+            
+            // Find the corresponding pair
+            const englishWord = card1.dataset.language === 'english' 
+                ? card1.dataset.value 
+                : card2.dataset.value;
+            const frenchWord = card1.dataset.language === 'french' 
+                ? card1.dataset.value 
+                : card2.dataset.value;
+            
+            // Check if this is a correct match
+            const isMatch = currentPairs.some(pair => 
+                pair.english === englishWord && 
+                pair.french === frenchWord
+            );
+            
+            if (isMatch) {
+                // Handle successful match
+                setTimeout(() => {
+                    card1.classList.add('match');
+                    card2.classList.add('match');
+                    
+                    setTimeout(() => {
+                        card1.classList.add('fade-out');
+                        card2.classList.add('fade-out');
+                        
+                        matchedPairs++;
+                        totalScore++;
+                        updateStats();
+                        
+                        // Check if all pairs are matched
+                        if (matchedPairs === currentPairs.length) {
+                            setTimeout(loadNewRound, 1000);
+                        }
+                        
+                        selectedCards = [];
+                        isProcessing = false;
+                    }, 500);
+                }, 500);
+            } else {
+                // Handle incorrect match
+                setTimeout(() => {
+                    // Add incorrect class for the flash effect
+                    card1.classList.add('incorrect');
+                    card2.classList.add('incorrect');
+                    
+                    // Remove classes after animation completes
+                    setTimeout(() => {
+                        card1.classList.remove('selected', 'incorrect');
+                        card2.classList.remove('selected', 'incorrect');
+                        selectedCards = [];
+                        isProcessing = false;
+                    }, 500);
+                }, 500);
+            }
+        }
+
+        // Update the statistics display
+        function updateStats() {
+            matchedCounter.textContent = matchedPairs;
+            scoreElement.textContent = totalScore;
+            const progressPercentage = (matchedPairs / currentPairs.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Load a new round with fresh word pairs
+        function loadNewRound() {
+            matchedPairs = 0;
+            selectedCards = [];
+            createGameCards();
+            updateStats();
+        }
+
+        // Initialize the game
+        function initGame() {
+            // Get values from selectors
+            currentCategory = categorySelect.value;
+            totalPairs = parseInt(difficultySelect.value);
+            
+            // Update header title based on category
+            const categoryName = languageData.categories[currentCategory].name;
+            headerTitle.textContent = `English - French ${categoryName} Vocabulary`;
+            
+            createGameCards();
+            updateStats();
+        }
+        
+        // Handle category change
+        function handleCategoryChange() {
+            currentCategory = categorySelect.value;
+            loadNewRound();
+            
+            // Update header
+            const categoryName = languageData.categories[currentCategory].name;
+            headerTitle.textContent = `English - French ${categoryName} Vocabulary`;
+        }
+        
+        // Handle difficulty change
+        function handleDifficultyChange() {
+            totalPairs = parseInt(difficultySelect.value);
+            loadNewRound();
+        }
+        
+        // Reset score
+        function resetScore() {
+            totalScore = 0;
+            attempts = 0;
+            updateStats();
+        }
+
+        // Event listeners
+        newWordsBtn.addEventListener('click', loadNewRound);
+        resetScoreBtn.addEventListener('click', resetScore);
+        categorySelect.addEventListener('change', handleCategoryChange);
+        difficultySelect.addEventListener('change', handleDifficultyChange);
+
+        // Start the game when the page loads
+        window.addEventListener('load', () => {
+            populateCategorySelect();
+            initGame();
+        });
+    </script>
+</body>
+</html>
