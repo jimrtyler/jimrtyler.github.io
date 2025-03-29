@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cloud Practitioner Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #232f3e;
+            text-align: center;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #ff9900;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #ec7211;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #ff9900;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>AWS Cloud Practitioner Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+
+
+    <script src="https://apis.google.com/js/platform.js"></script>
+
+<div class="g-ytsubscribe" data-channel="PowerShellEngineer" data-layout="default" data-count="default"></div>
+    <script>
+        const quizData = [
+            {
+                question: "What is the AWS service that provides a virtual server in the cloud?",
+                options: [
+                    "AWS Lambda",
+                    "Amazon EC2 (Elastic Compute Cloud)",
+                    "Amazon S3 (Simple Storage Service)",
+                    "Amazon RDS (Relational Database Service)"
+                ],
+                correctIndex: 1,
+                explanation: "Amazon EC2 (Elastic Compute Cloud) provides resizable virtual servers (instances) in the cloud. It allows you to choose from various instance types optimized for different use cases and scale capacity up or down as needed. Lambda is a serverless compute service, S3 is an object storage service, and RDS is a managed database service."
+            },
+            {
+                question: "Which AWS service is designed for object storage and is commonly used to store and retrieve any amount of data from anywhere on the web?",
+                options: [
+                    "Amazon S3 (Simple Storage Service)",
+                    "Amazon EBS (Elastic Block Store)",
+                    "Amazon EFS (Elastic File System)",
+                    "AWS Storage Gateway"
+                ],
+                correctIndex: 0,
+                explanation: "Amazon S3 (Simple Storage Service) is an object storage service designed to store and retrieve any amount of data from anywhere. It provides industry-leading scalability, data availability, security, and performance. EBS provides block-level storage volumes for EC2 instances, EFS is a file storage service, and Storage Gateway connects on-premises environments with cloud storage."
+            },
+            {
+                question: "What is the AWS pricing model that allows customers to pay a reduced hourly rate in exchange for a commitment to a consistent amount of usage for a 1 or 3 year term?",
+                options: [
+                    "Pay-as-you-go",
+                    "Spot Instances",
+                    "Reserved Instances",
+                    "Dedicated Hosts"
+                ],
+                correctIndex: 2,
+                explanation: "Reserved Instances provide a significant discount compared to On-Demand pricing in exchange for a commitment to a specific instance type in a specific region for a 1 or 3 year term. This helps optimize costs for predictable workloads. Pay-as-you-go is the standard pricing model, Spot Instances offer spare computing capacity at steep discounts but can be interrupted, and Dedicated Hosts are physical servers dedicated to your use."
+            },
+            {
+                question: "Which AWS service would you use to store and manage Docker containers?",
+                options: [
+                    "AWS Fargate",
+                    "Amazon ECS (Elastic Container Service)",
+                    "Amazon S3",
+                    "AWS Lambda"
+                ],
+                correctIndex: 1,
+                explanation: "Amazon ECS (Elastic Container Service) is a highly scalable, fast container management service that makes it easy to run, stop, and manage Docker containers on a cluster. Fargate is a serverless compute engine for containers that works with ECS and EKS. S3 is object storage, and Lambda is a serverless compute service."
+            },
+            {
+                question: "What is the AWS shared responsibility model?",
+                options: [
+                    "AWS is responsible for all security in the cloud",
+                    "Customers are responsible for all security in the cloud",
+                    "AWS is responsible for security OF the cloud, while customers are responsible for security IN the cloud",
+                    "Security responsibilities are negotiated on a case-by-case basis"
+                ],
+                correctIndex: 2,
+                explanation: "The AWS Shared Responsibility Model clearly defines who is responsible for what regarding cloud security. AWS is responsible for security OF the cloud (infrastructure, hardware, software, facilities), while customers are responsible for security IN the cloud (data, platform, applications, IAM, OS configurations, network traffic protection)."
+            },
+            {
+                question: "Which AWS service provides a virtual network dedicated to your AWS account?",
+                options: [
+                    "AWS Direct Connect",
+                    "Amazon VPC (Virtual Private Cloud)",
+                    "AWS Transit Gateway",
+                    "Amazon Route 53"
+                ],
+                correctIndex: 1,
+                explanation: "Amazon VPC (Virtual Private Cloud) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a virtual network that you define. Direct Connect is a dedicated network connection to AWS, Transit Gateway connects VPCs and on-premises networks, and Route 53 is a DNS web service."
+            },
+            {
+                question: "What is the AWS service that provides managed database services?",
+                options: [
+                    "Amazon EC2",
+                    "Amazon DynamoDB",
+                    "Amazon RDS (Relational Database Service)",
+                    "Amazon S3"
+                ],
+                correctIndex: 2,
+                explanation: "Amazon RDS (Relational Database Service) makes it easy to set up, operate, and scale a relational database in the cloud. It provides cost-efficient and resizable capacity while automating time-consuming administration tasks such as hardware provisioning, database setup, patching, and backups. It supports multiple database engines including MySQL, PostgreSQL, Oracle, SQL Server, and MariaDB. DynamoDB is a NoSQL database service."
+            },
+            {
+                question: "Which of the following is NOT one of the AWS Well-Architected Framework pillars?",
+                options: [
+                    "Operational Excellence",
+                    "Financial Management",
+                    "Security",
+                    "Reliability"
+                ],
+                correctIndex: 1,
+                explanation: "The AWS Well-Architected Framework consists of six pillars: Operational Excellence, Security, Reliability, Performance Efficiency, Cost Optimization, and Sustainability. Financial Management is not one of the pillars, although Cost Optimization does relate to financial aspects of cloud operations."
+            },
+            {
+                question: "What AWS service allows you to run code without provisioning or managing servers?",
+                options: [
+                    "Amazon EC2",
+                    "AWS Lambda",
+                    "Amazon ECS",
+                    "AWS Elastic Beanstalk"
+                ],
+                correctIndex: 1,
+                explanation: "AWS Lambda lets you run code without provisioning or managing servers. You pay only for the compute time you consume - there is no charge when your code is not running. Lambda is a serverless compute service that runs your code in response to events and automatically manages the underlying compute resources for you."
+            },
+            {
+                question: "Which AWS service provides a simple way to create collections of related AWS resources and provision them using a template?",
+                options: [
+                    "AWS Config",
+                    "AWS CloudFormation",
+                    "AWS Systems Manager",
+                    "AWS Service Catalog"
+                ],
+                correctIndex: 1,
+                explanation: "AWS CloudFormation provides a common language to describe and provision all the infrastructure resources in your cloud environment. It allows you to use a simple text file (template) to model and provision, in an automated and secure manner, all the resources needed for your applications across all regions and accounts."
+            },
+            {
+                question: "What AWS service provides a fully managed load balancing service?",
+                options: [
+                    "Amazon Route 53",
+                    "AWS Global Accelerator",
+                    "Amazon CloudFront",
+                    "Elastic Load Balancing (ELB)"
+                ],
+                correctIndex: 3,
+                explanation: "Elastic Load Balancing (ELB) automatically distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, containers, and IP addresses. It can handle the varying load of your application traffic in a single Availability Zone or across multiple Availability Zones. ELB offers three types of load balancers: Application Load Balancer, Network Load Balancer, and Classic Load Balancer."
+            },
+            {
+                question: "What AWS service provides a simple and cost-effective way to back up data?",
+                options: [
+                    "Amazon S3 Glacier",
+                    "AWS Backup",
+                    "Amazon CloudWatch",
+                    "AWS CloudTrail"
+                ],
+                correctIndex: 1,
+                explanation: "AWS Backup is a fully managed backup service that makes it easy to centralize and automate the backup of data across AWS services. It allows you to configure backup policies and monitor backup activity for all your AWS resources. S3 Glacier is a storage service for data archiving, CloudWatch is a monitoring service, and CloudTrail records AWS API calls."
+            },
+            {
+                question: "Which AWS service allows you to analyze your AWS costs and usage?",
+                options: [
+                    "AWS Trusted Advisor",
+                    "AWS Cost Explorer",
+                    "Amazon Inspector",
+                    "AWS Config"
+                ],
+                correctIndex: 1,
+                explanation: "AWS Cost Explorer provides a visualization of your AWS costs and usage over time. It allows you to view patterns in your spending, identify cost drivers, and detect anomalies. You can also forecast future costs based on historical data. Trusted Advisor provides recommendations to optimize your AWS environment, Inspector is a security assessment service, and Config tracks resource configurations."
+            },
+            {
+                question: "What AWS service provides a secure, fast, and developer-friendly CI/CD service?",
+                options: [
+                    "AWS Elastic Beanstalk",
+                    "AWS OpsWorks",
+                    "AWS CodeDeploy",
+                    "AWS CodePipeline"
+                ],
+                correctIndex: 3,
+                explanation: "AWS CodePipeline is a fully managed continuous delivery service that helps you automate your release pipelines for fast and reliable application and infrastructure updates. It automates the build, test, and deploy phases of your release process every time there is a code change. CodeDeploy is specifically for automating application deployments, Elastic Beanstalk is a PaaS solution, and OpsWorks is a configuration management service."
+            },
+            {
+                question: "Which AWS service provides DNS services?",
+                options: [
+                    "Amazon Route 53",
+                    "AWS Direct Connect",
+                    "Amazon CloudFront",
+                    "AWS Transit Gateway"
+                ],
+                correctIndex: 0,
+                explanation: "Amazon Route 53 is a highly available and scalable Domain Name System (DNS) web service. It is designed to give developers and businesses a reliable and cost-effective way to route end users to Internet applications by translating domain names into IP addresses. Route 53 also offers domain name registration services."
+            },
+            {
+                question: "What AWS feature allows you to isolate resources from each other within an AWS account?",
+                options: [
+                    "VPC Peering",
+                    "Security Groups",
+                    "Resource Tags",
+                    "IAM Roles"
+                ],
+                correctIndex: 1,
+                explanation: "Security Groups act as a virtual firewall for your instances to control inbound and outbound traffic. They operate at the instance level and can be used to isolate resources from each other within an AWS account. VPC Peering connects VPCs, Resource Tags are used for organization and cost allocation, and IAM Roles define permissions for AWS services and users."
+            },
+            {
+                question: "Which AWS service is primarily used for real-time processing of streaming data?",
+                options: [
+                    "Amazon Redshift",
+                    "Amazon Kinesis",
+                    "Amazon EMR",
+                    "Amazon QuickSight"
+                ],
+                correctIndex: 1,
+                explanation: "Amazon Kinesis makes it easy to collect, process, and analyze real-time, streaming data so you can get timely insights and react quickly to new information. It offers key capabilities to cost-effectively process streaming data at any scale. Redshift is a data warehouse service, EMR is for big data processing, and QuickSight is a business intelligence service."
+            },
+            {
+                question: "What is the minimum number of Availability Zones that AWS recommends for a highly available architecture?",
+                options: [
+                    "1",
+                    "2",
+                    "3",
+                    "4"
+                ],
+                correctIndex: 1,
+                explanation: "AWS recommends using at least 2 Availability Zones for high availability. This allows your application to remain available even if one Availability Zone becomes unavailable due to an outage or other issue. Deploying resources across multiple AZs is a fundamental best practice for building resilient architectures in AWS."
+            },
+            {
+                question: "Which AWS service helps you identify compliance violations and security threats?",
+                options: [
+                    "AWS Shield",
+                    "AWS WAF",
+                    "Amazon GuardDuty",
+                    "AWS Systems Manager"
+                ],
+                correctIndex: 2,
+                explanation: "Amazon GuardDuty is a threat detection service that continuously monitors for malicious activity and unauthorized behavior to protect your AWS accounts, workloads, and data. It uses machine learning, anomaly detection, and integrated threat intelligence to identify and prioritize potential threats. AWS Shield protects against DDoS attacks, WAF helps protect web applications, and Systems Manager helps you manage your AWS resources."
+            },
+            {
+                question: "What does the AWS Global Infrastructure consist of?",
+                options: [
+                    "Regions and Edge Locations only",
+                    "Regions, Availability Zones, and Edge Locations",
+                    "Availability Zones and VPCs only",
+                    "Regions and VPCs only"
+                ],
+                correctIndex: 1,
+                explanation: "The AWS Global Infrastructure consists of Regions, Availability Zones, and Edge Locations. Regions are separate geographic areas, each containing multiple Availability Zones. Availability Zones are physically separated data centers within a Region. Edge Locations are endpoints for AWS used for caching content and reducing latency for end users. VPCs are customer-defined virtual networks within AWS."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        loadQuestion();
+    </script>
+</body>
+</html>
