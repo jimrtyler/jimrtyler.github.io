@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Cloud Digital Leader Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4285f4;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #0f9d58;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #4285f4;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #0f9d58;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ea4335;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #3367d6;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #4285f4;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Google Cloud Digital Leader Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Which Google Cloud service provides a fully managed NoSQL document database?",
+                options: [
+                    "Cloud SQL",
+                    "Bigtable",
+                    "Firestore",
+                    "Spanner"
+                ],
+                correctIndex: 2,
+                explanation: "Firestore is Google Cloud's fully managed NoSQL document database that simplifies storing, syncing, and querying data for mobile, web, and IoT apps at global scale. Cloud SQL is a fully managed relational database service, Bigtable is a NoSQL wide-column database for large analytical and operational workloads, and Spanner is a globally distributed relational database.",
+                domain: "Digital Transformation with Google Cloud"
+            },
+            {
+                question: "A retail company wants to predict customer purchases based on historical data. Which Google Cloud service should they use?",
+                options: [
+                    "BigQuery ML",
+                    "Cloud Functions",
+                    "Cloud Monitoring",
+                    "Cloud Deployment Manager"
+                ],
+                correctIndex: 0,
+                explanation: "BigQuery ML enables users to create and execute machine learning models in BigQuery using standard SQL queries, making it ideal for predicting customer purchases based on historical data. Cloud Functions is a serverless execution environment, Cloud Monitoring provides visibility into performance and availability, and Cloud Deployment Manager is an infrastructure deployment service.",
+                domain: "Innovating with Data and Google Cloud"
+            },
+            {
+                question: "Which of the following best describes the concept of 'shared fate' in Google Cloud?",
+                options: [
+                    "All customers share the same infrastructure",
+                    "Google and customers work together to achieve successful outcomes",
+                    "Multiple teams share responsibility for a single application",
+                    "Resources are distributed equally among all Google Cloud regions"
+                ],
+                correctIndex: 1,
+                explanation: "Shared fate is an evolution of the shared responsibility model where Google Cloud not only provides secure infrastructure but also works proactively with customers to achieve their business outcomes. It represents a partnership approach where Google works alongside customers to ensure their success, rather than simply dividing security responsibilities.",
+                domain: "General Cloud Knowledge"
+            },
+            {
+                question: "Which Google Cloud networking service automatically distributes incoming application traffic across multiple instances?",
+                options: [
+                    "Cloud CDN",
+                    "Cloud NAT",
+                    "Cloud Load Balancing",
+                    "Cloud VPN"
+                ],
+                correctIndex: 2,
+                explanation: "Cloud Load Balancing distributes incoming application traffic across multiple instances to provide high availability, fault tolerance, and enhanced performance. Cloud CDN is a content delivery network, Cloud NAT provides outbound NAT service for instances without external IPs, and Cloud VPN securely connects your on-premises network to your Google Cloud VPC.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "Which Google Cloud solution helps organizations analyze large datasets in near real-time without managing infrastructure?",
+                options: [
+                    "Cloud Storage",
+                    "BigQuery",
+                    "Compute Engine",
+                    "App Engine"
+                ],
+                correctIndex: 1,
+                explanation: "BigQuery is Google Cloud's serverless, highly scalable, and cost-effective multi-cloud data warehouse designed for business agility. It enables analyzing large datasets in near real-time without the need to manage infrastructure. Cloud Storage is for object storage, Compute Engine provides VMs, and App Engine is a platform for developing and hosting web applications.",
+                domain: "Innovating with Data and Google Cloud"
+            },
+            {
+                question: "Which of the following is a key benefit of containers in application modernization?",
+                options: [
+                    "They require more resources than virtual machines",
+                    "They provide consistent environments across development and production",
+                    "They eliminate the need for code testing",
+                    "They automatically optimize application code"
+                ],
+                correctIndex: 1,
+                explanation: "A key benefit of containers is providing consistent environments across development and production. Containers package application code, configurations, and dependencies into a single object that can run reliably across different computing environments, reducing 'it works on my machine' problems. Containers are lightweight (not resource-intensive), still require code testing, and don't automatically optimize code.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "What is a primary advantage of the pay-as-you-go pricing model in cloud computing?",
+                options: [
+                    "It always costs less than on-premises solutions",
+                    "It converts variable expenses to fixed expenses",
+                    "It eliminates the need for capacity planning",
+                    "It converts capital expenditure to operational expenditure"
+                ],
+                correctIndex: 3,
+                explanation: "A primary advantage of the pay-as-you-go pricing model is that it converts capital expenditure (CapEx) to operational expenditure (OpEx). Instead of making large upfront investments in data centers and servers, customers can pay only for the resources they consume. This doesn't always cost less than on-premises, converts fixed expenses to variable (not the opposite), and good capacity planning is still important for cost optimization.",
+                domain: "General Cloud Knowledge"
+            },
+            {
+                question: "Which Google Cloud security service provides application-level protection against web attacks like cross-site scripting and SQL injection?",
+                options: [
+                    "Cloud Armor",
+                    "Identity-Aware Proxy",
+                    "VPC Service Controls",
+                    "Security Command Center"
+                ],
+                correctIndex: 0,
+                explanation: "Cloud Armor is Google Cloud's web application firewall (WAF) service that provides protection against web attacks like cross-site scripting (XSS), SQL injection, and other OWASP Top 10 vulnerabilities. It also offers DDoS protection for applications. Identity-Aware Proxy provides access control, VPC Service Controls establishes security perimeters, and Security Command Center is a security and risk management platform.",
+                domain: "Security, Privacy, and Compliance"
+            },
+            {
+                question: "A company wants to modernize a monolithic application. Which approach represents the proper first step?",
+                options: [
+                    "Immediately rewrite the entire application as microservices",
+                    "Assess the current architecture and identify components that can be decoupled",
+                    "Migrate the application to containers without making any changes",
+                    "Replace the application with a SaaS solution"
+                ],
+                correctIndex: 1,
+                explanation: "The proper first step in modernizing a monolithic application is to assess the current architecture and identify components that can be decoupled. This incremental approach allows for strategic decomposition of the monolith rather than a risky complete rewrite. It helps understand dependencies, identify suitable candidates for extraction, and plan a phased modernization approach. Immediately rewriting everything is risky, simply containerizing without changes doesn't address architectural issues, and replacing with SaaS may not meet specific business requirements.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "Which Google Cloud solution helps developers build and deploy applications without managing the underlying infrastructure?",
+                options: [
+                    "Compute Engine",
+                    "Cloud Run",
+                    "Persistent Disk",
+                    "Virtual Private Cloud"
+                ],
+                correctIndex: 1,
+                explanation: "Cloud Run is a fully managed platform that helps developers build and deploy containerized applications without managing infrastructure. It automatically scales stateless containers, charges only for used resources, and supports various programming languages. Compute Engine requires more infrastructure management, Persistent Disk is a storage solution, and Virtual Private Cloud is a networking service.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "Which statement best describes the concept of digital transformation?",
+                options: [
+                    "Replacing all paper documents with digital files",
+                    "Implementing a cloud-based email system",
+                    "Using technology to fundamentally change how businesses operate and deliver value",
+                    "Moving existing on-premises servers to the cloud without changes"
+                ],
+                correctIndex: 2,
+                explanation: "Digital transformation refers to using technology to fundamentally change how businesses operate and deliver value to customers. It involves reimagining business processes, culture, and customer experiences through digital technologies. Simply digitizing documents, implementing cloud email, or performing lift-and-shift migrations are limited tactical changes that don't constitute complete digital transformation.",
+                domain: "Digital Transformation with Google Cloud"
+            },
+            {
+                question: "According to Google Cloud's shared fate model, which of the following is primarily the customer's responsibility?",
+                options: [
+                    "Physical security of Google data centers",
+                    "Applying security patches to the host operating system",
+                    "Configuring access controls for cloud resources",
+                    "Maintaining network equipment in Google facilities"
+                ],
+                correctIndex: 2,
+                explanation: "Under Google Cloud's shared fate model, configuring access controls for cloud resources remains primarily the customer's responsibility. While Google works proactively to help customers succeed, customers must still implement appropriate identity and access management policies for their resources. Google is responsible for physical data center security, patching the host operating system, and maintaining Google network equipment.",
+                domain: "Security, Privacy, and Compliance"
+            },
+            {
+                question: "Which Google Cloud service enables enterprises to control the encryption keys used to protect their data?",
+                options: [
+                    "Cloud Key Management Service (KMS)",
+                    "Cloud Identity",
+                    "Cloud Deployment Manager",
+                    "Cloud Source Repositories"
+                ],
+                correctIndex: 0,
+                explanation: "Cloud Key Management Service (KMS) enables enterprises to manage and control the encryption keys used to protect their data in Google Cloud. It allows organizations to generate, use, rotate, and destroy cryptographic keys to maintain control over who can use and access them. Cloud Identity manages users and groups, Cloud Deployment Manager provisions resources, and Cloud Source Repositories hosts Git repositories.",
+                domain: "Security, Privacy, and Compliance"
+            },
+            {
+                question: "A company is planning to move to Google Cloud and wants to estimate costs. Which tool should they use?",
+                options: [
+                    "Cloud Monitoring",
+                    "Google Cloud Pricing Calculator",
+                    "Cloud Profiler",
+                    "BigQuery"
+                ],
+                correctIndex: 1,
+                explanation: "The Google Cloud Pricing Calculator is a tool that helps estimate the costs of using Google Cloud products and services. It allows users to configure and model their expected usage across various Google Cloud services to generate a detailed cost estimate. Cloud Monitoring tracks performance, Cloud Profiler identifies performance bottlenecks, and BigQuery is a data warehouse for analysis.",
+                domain: "General Cloud Knowledge"
+            },
+            {
+                question: "Which Google Cloud solution is designed specifically for running traditional enterprise workloads like SAP, Oracle, and Microsoft SQL Server?",
+                options: [
+                    "Google Kubernetes Engine",
+                    "App Engine",
+                    "Bare Metal Solution",
+                    "Cloud Functions"
+                ],
+                correctIndex: 2,
+                explanation: "Bare Metal Solution is designed specifically for running traditional enterprise workloads like SAP, Oracle, and Microsoft SQL Server that may require specialized hardware, OS versions, or configurations not available in standard cloud environments. It provides dedicated hardware hosted in a Google Cloud data center with low-latency connectivity to Google Cloud services. GKE is for containerized workloads, App Engine for web applications, and Cloud Functions for event-driven serverless computing.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "What is a primary benefit of using data analytics in business decision-making?",
+                options: [
+                    "It eliminates the need for human judgment",
+                    "It generates more data for storage",
+                    "It provides insights to drive informed decisions",
+                    "It automatically implements business process changes"
+                ],
+                correctIndex: 2,
+                explanation: "A primary benefit of using data analytics in business decision-making is that it provides insights to drive informed decisions. Data analytics helps organizations identify patterns, trends, and correlations that might not be immediately apparent, enabling better strategic planning and operational improvements. It complements rather than eliminates human judgment, aims to derive value from existing data (not just generate more), and informs but doesn't automatically implement process changes.",
+                domain: "Innovating with Data and Google Cloud"
+            },
+            {
+                question: "Which Google Cloud AI solution allows developers to use pre-trained machine learning models via API calls?",
+                options: [
+                    "Vertex AI",
+                    "Cloud AI Platform",
+                    "Cloud AutoML",
+                    "Cloud AI APIs"
+                ],
+                correctIndex: 3,
+                explanation: "Google Cloud AI APIs (like Vision AI, Natural Language API, Speech-to-Text, etc.) allow developers to leverage Google's pre-trained machine learning models via simple API calls without needing ML expertise. These APIs provide ready-to-use capabilities for common tasks like image analysis, language processing, and speech recognition. Vertex AI is a unified platform for custom ML model development, Cloud AI Platform is an older name for ML services, and Cloud AutoML enables custom model creation with minimal expertise.",
+                domain: "Innovating with Data and Google Cloud"
+            },
+            {
+                question: "What is a key characteristic of a microservices architecture?",
+                options: [
+                    "It requires all services to share a common database",
+                    "It consists of loosely coupled, independently deployable services",
+                    "It always costs less than a monolithic architecture",
+                    "It eliminates the need for API management"
+                ],
+                correctIndex: 1,
+                explanation: "A key characteristic of microservices architecture is that it consists of loosely coupled, independently deployable services. Each microservice is focused on a specific business function and can be developed, deployed, and scaled independently. Microservices typically have their own databases (not shared), may have higher operational complexity and costs in some cases, and actually increase the importance of API management for service communication.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "Which Google Cloud interconnect option provides the highest capacity for connecting an on-premises network to Google Cloud?",
+                options: [
+                    "Cloud VPN",
+                    "Direct Peering",
+                    "Dedicated Interconnect",
+                    "Cloud Router"
+                ],
+                correctIndex: 2,
+                explanation: "Dedicated Interconnect provides the highest capacity for connecting an on-premises network to Google Cloud, offering connections of 10 Gbps or 100 Gbps per circuit and up to 8 circuits. It provides a direct physical connection between your on-premises network and Google's network. Cloud VPN offers up to 3 Gbps per tunnel, Direct Peering doesn't provide SLAs, and Cloud Router is a service for dynamic route exchange, not a connection type.",
+                domain: "Infrastructure and Application Modernization with Google Cloud"
+            },
+            {
+                question: "Which Google Cloud principle refers to designing systems that continue to function despite component failures?",
+                options: [
+                    "Elasticity",
+                    "Resilience",
+                    "Scalability",
+                    "Agility"
+                ],
+                correctIndex: 1,
+                explanation: "Resilience refers to designing systems that continue to function despite component failures. It involves building redundancy, fault tolerance, and self-healing capabilities into applications and infrastructure. Elasticity refers to automatically scaling resources up or down based on demand, scalability is the ability to handle growing workloads by adding resources, and agility refers to the speed at which organizations can respond to changes.",
+                domain: "General Cloud Knowledge"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
