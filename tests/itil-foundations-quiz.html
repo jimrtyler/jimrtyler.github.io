@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Which of the following best describes the purpose of the Service Value System (SVS) in ITIL 4?",
+                options: [
+                    "To control the provision of user access",
+                    "To ensure organizations generate revenue",
+                    "To report on the performance of service components",
+                    "To facilitate value creation through services"
+                ],
+                correctIndex: 3,
+                explanation: "The ITIL 4 Service Value System (SVS) describes how all the components and activities of an organization work together as a system to enable value creation. It represents how the organization creates value through services, ensuring all parts work together in an integrated way. The other options relate to specific activities or limited aspects, not the overarching purpose of the SVS.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What are the FOUR dimensions of Service Management?",
+                options: [
+                    "Organizations and people, Information and technology, Partners and suppliers, Value streams and processes",
+                    "Service strategy, Service design, Service transition, Service operation",
+                    "Plan, Do, Check, Act",
+                    "Utility, Warranty, Cost, Risk"
+                ],
+                correctIndex: 0,
+                explanation: "The four dimensions of service management in ITIL 4 are: Organizations and people, Information and technology, Partners and suppliers, and Value streams and processes. These dimensions represent the perspectives that should be considered to ensure a holistic approach to service management. The second option lists the lifecycle stages from ITIL v3, the third option is the Deming cycle, and the fourth option lists aspects of value and considerations for service provision.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the definition of a 'problem' in ITIL?",
+                options: [
+                    "A planned interruption to an IT service",
+                    "A cause of one or more incidents",
+                    "An unplanned interruption to an IT service",
+                    "A deviation from expected standard operations"
+                ],
+                correctIndex: 1,
+                explanation: "In ITIL, a problem is defined as the cause of one or more incidents. Problems are typically identified through trend analysis of incidents or when a major incident occurs that requires root cause analysis. An unplanned interruption is an incident, a planned interruption is a change or release, and a deviation from standard operations could describe various situations including an incident.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which of the following is NOT one of the seven guiding principles of ITIL 4?",
+                options: [
+                    "Progress iteratively with feedback",
+                    "Focus on value",
+                    "Keep it simple and practical",
+                    "Standardize then automate"
+                ],
+                correctIndex: 3,
+                explanation: "The seven guiding principles of ITIL 4 are: 1) Focus on value, 2) Start where you are, 3) Progress iteratively with feedback, 4) Collaborate and promote visibility, 5) Think and work holistically, 6) Keep it simple and practical, and 7) Optimize and automate. 'Standardize then automate' is not one of the seven guiding principles, although standardization is often a prerequisite for effective automation.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which practice is responsible for moving changes into the live environment?",
+                options: [
+                    "Service desk",
+                    "Release management",
+                    "Change enablement",
+                    "Problem management"
+                ],
+                correctIndex: 1,
+                explanation: "Release management is the practice responsible for making new and changed services and features available for use. It involves planning, scheduling, and controlling the movement of releases to test and live environments. Change enablement (formerly change management) is about controlling the lifecycle of all changes, service desk handles user requests and incidents, and problem management addresses the root causes of incidents.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the purpose of the 'continual improvement' practice?",
+                options: [
+                    "To ensure the organization's suppliers meet agreed-upon requirements",
+                    "To align the organization's practices and services with changing business needs",
+                    "To reduce the likelihood and impact of incidents by identifying actual and potential causes",
+                    "To create and manage information required to support a service"
+                ],
+                correctIndex: 1,
+                explanation: "The purpose of the continual improvement practice is to align the organization's practices and services with changing business needs through the ongoing improvement of products, services, and practices. It's about continuously identifying and implementing improvements to all aspects of the organization. The other options describe the purposes of supplier management, problem management, and information management practices respectively.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which statement about the utility and warranty of services is CORRECT?",
+                options: [
+                    "Utility is what the service does, and warranty is how it is delivered",
+                    "Utility is the cost of the service, and warranty is the guarantee against defects",
+                    "Utility is the supplier perspective, and warranty is the customer perspective",
+                    "Utility is the service functionality, and warranty is the profit margin"
+                ],
+                correctIndex: 0,
+                explanation: "Utility is what the service does and refers to the functionality offered by a product or service to meet a particular need. Warranty is how the service is delivered and refers to the assurance that a product or service will meet agreed requirements. In other words, utility is about 'fit for purpose' and warranty is about 'fit for use'. The other options incorrectly define these terms.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which of the following is a key component of the Change Enablement practice?",
+                options: [
+                    "Designing new service solutions",
+                    "Assessing and evaluating changes",
+                    "Recording all operational events",
+                    "Creating knowledge articles"
+                ],
+                correctIndex: 1,
+                explanation: "A key component of the Change Enablement practice is assessing and evaluating changes, which includes analyzing the risks, impact, benefits, and costs associated with proposed changes. This practice ensures that changes are implemented in a controlled manner. Designing new service solutions is part of service design, recording operational events relates to event management, and creating knowledge articles is part of knowledge management.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which of the following is NOT a value stream according to ITIL 4?",
+                options: [
+                    "Customer Engagement",
+                    "Products and Services",
+                    "Service Relationship",
+                    "Demand to Value"
+                ],
+                correctIndex: 3,
+                explanation: "ITIL 4 doesn't specifically define 'Demand to Value' as one of its standard value streams. The commonly referenced value streams in ITIL 4 include: how to deliver new products/services, how to deliver product/service orders, how to manage customer relationships, how to manage supplier relationships, etc. 'Customer Engagement', 'Products and Services', and 'Service Relationship' could all represent aspects of ITIL 4 value streams.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What is the purpose of the 'service level management' practice?",
+                options: [
+                    "To set clear business-based targets for service performance",
+                    "To minimize the negative impact of incidents",
+                    "To reduce the likelihood of incidents by managing risks",
+                    "To protect information needed by the organization"
+                ],
+                correctIndex: 0,
+                explanation: "The purpose of service level management is to set clear business-based targets for service performance, so that the delivery of a service can be properly assessed, monitored, and managed against these targets. It involves the creation of service level agreements (SLAs) and monitoring service achievements against these agreements. The other options describe the purposes of incident management, risk management, and information security management respectively.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "According to ITIL 4, services provide value by helping customers to achieve:",
+                options: [
+                    "Service availability",
+                    "Outcomes, without having to manage specific costs and risks",
+                    "Operational efficiency",
+                    "Technical excellence"
+                ],
+                correctIndex: 1,
+                explanation: "According to ITIL 4, services provide value by helping customers to achieve outcomes without having to manage specific costs and risks. This is a key part of ITIL's definition of a service. By using a service, customers can achieve their desired outcomes while the service provider takes responsibility for certain costs and risks associated with that achievement. The other options are aspects of service management, but don't define how services provide value.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which part of the Service Value System connects all other components and activities?",
+                options: [
+                    "Service value chain",
+                    "Opportunity and demand",
+                    "Governance",
+                    "Continual improvement"
+                ],
+                correctIndex: 0,
+                explanation: "The service value chain is the central element of the Service Value System (SVS) that connects all other components and activities. It is an operating model for the creation, delivery, and continual improvement of services. It defines the key activities required to respond to demand and facilitate value creation through the creation and management of products and services. The other options are components of the SVS but not the central connecting element.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which statement about the relationship between problems and incidents is CORRECT?",
+                options: [
+                    "A problem always causes multiple incidents",
+                    "An incident is always caused by a single problem",
+                    "A problem is the cause of one or more incidents",
+                    "Incidents and problems are different terms for the same concept"
+                ],
+                correctIndex: 2,
+                explanation: "A problem is the cause of one or more incidents. This means that a problem might be the root cause of a single incident or multiple incidents. Not all problems cause multiple incidents, and not all incidents are caused by identified problems. Incidents and problems are distinct concepts in ITIL - an incident is an unplanned interruption or reduction in quality of a service, while a problem is the underlying cause.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which of the following is a key metric used in incident management?",
+                options: [
+                    "Number of workarounds applied",
+                    "Mean time to restore service (MTRS)",
+                    "Rate of server utilization",
+                    "Number of lines of code developed"
+                ],
+                correctIndex: 1,
+                explanation: "Mean time to restore service (MTRS) is a key metric used in incident management, measuring the average time taken to restore service after an incident. This metric directly relates to the purpose of incident management, which is to minimize the negative impact of incidents by restoring normal service operation as quickly as possible. The other options are not standard incident management metrics; workarounds relate to problem management, server utilization to capacity management, and lines of code to development activities.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which guiding principle emphasizes the need to leverage existing services, processes, and technology when improving services?",
+                options: [
+                    "Focus on value",
+                    "Start where you are",
+                    "Think and work holistically",
+                    "Progress iteratively with feedback"
+                ],
+                correctIndex: 1,
+                explanation: "The guiding principle 'Start where you are' emphasizes the need to leverage existing services, processes, and technology when improving services. It advises against starting from scratch without first considering what is already available, and promotes making use of existing capabilities. This approach helps to reduce time, resources, and effort needed to improve services while acknowledging the value of what already exists.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which ITIL practice requires understanding patterns of business activity to forecast future demand for services?",
+                options: [
+                    "Capacity and performance management",
+                    "Service level management",
+                    "Problem management",
+                    "Relationship management"
+                ],
+                correctIndex: 0,
+                explanation: "Capacity and performance management requires understanding patterns of business activity to forecast future demand for services. This practice ensures that services will meet agreed performance requirements by managing resources to meet current and projected demands. Understanding business patterns helps in planning capacity to meet fluctuating demands. The other practices don't specifically focus on forecasting demand based on business activity patterns.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the correct definition of 'value' according to ITIL 4?",
+                options: [
+                    "The monetary worth of a service",
+                    "The perceived benefits, usefulness, and importance of something",
+                    "The total cost of ownership for a service",
+                    "The technical functionality of a system"
+                ],
+                correctIndex: 1,
+                explanation: "According to ITIL 4, value is defined as the perceived benefits, usefulness, and importance of something. Value is co-created through an active collaboration between providers and consumers and is ultimately determined from the consumer's perspective based on their perception. Value goes beyond just monetary worth or technical functionality and includes various aspects of what makes a service valuable to those who use it.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which of the following BEST describes the purpose of the 'service desk' practice?",
+                options: [
+                    "To provide a single point of contact for users to access services",
+                    "To design new services based on business requirements",
+                    "To manage external suppliers and their contracts",
+                    "To test and validate new services before deployment"
+                ],
+                correctIndex: 0,
+                explanation: "The purpose of the service desk practice is to provide a single point of contact for users to access services, report issues, and make requests. It serves as the primary interface between the service provider and users, capturing demand for incident resolution and service requests. It doesn't design services, manage suppliers, or test services - these are covered by other practices like service design, supplier management, and service validation.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which statement BEST describes the relationship between the service value chain activities?",
+                options: [
+                    "They must be performed in a specific sequence to create value",
+                    "They are performed by service providers and not by service consumers",
+                    "They can be combined in multiple sequences to create different value streams",
+                    "They represent mandatory stages that all services must go through"
+                ],
+                correctIndex: 2,
+                explanation: "Service value chain activities can be combined in multiple sequences to create different value streams. The service value chain provides a flexible operating model for the creation, delivery, and continual improvement of services. It does not mandate a specific sequence, as different value streams may require different combinations and flows of these activities to respond to specific types of demand and create appropriate value.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following is NOT a purpose of the change enablement practice?",
+                options: [
+                    "To maximize the number of successful service and product changes",
+                    "To assess change risk and minimize disruption",
+                    "To ensure changes are recorded and evaluated",
+                    "To fix the root causes of incidents"
+                ],
+                correctIndex: 3,
+                explanation: "Fixing the root causes of incidents is not a purpose of the change enablement practice. This is the purpose of problem management. The change enablement practice is concerned with maximizing the success of service and product changes, assessing and minimizing change risks, ensuring changes are properly recorded and evaluated, and facilitating the implementation of beneficial changes. Change enablement manages how changes are made, not specifically the technical fixes for incidents.",
+                domain: "Service Management Practices"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
