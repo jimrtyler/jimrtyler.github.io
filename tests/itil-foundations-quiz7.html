@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the definition of a 'service' according to ITIL 4?",
+                options: [
+                    "A means of enabling value co-creation by facilitating outcomes that customers want to achieve",
+                    "Any IT capability provided to users via an automated system",
+                    "A contract between a service provider and a customer",
+                    "A collection of technical resources managed by the IT department"
+                ],
+                correctIndex: 0,
+                explanation: "ITIL 4 defines a 'service' as a means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks. This definition emphasizes the collaborative nature of service delivery and focuses on outcomes rather than just technical capabilities.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which ITIL 4 component connects all other components of the Service Value System and converts demand into value?",
+                options: [
+                    "Guiding principles",
+                    "Governance",
+                    "Service value chain",
+                    "Continual improvement"
+                ],
+                correctIndex: 2,
+                explanation: "The service value chain connects all other components of the Service Value System and converts demand into value. It provides an operating model that outlines the key activities required to respond to demand and facilitate value creation through the creation and management of products and services.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What is the primary purpose of the 'plan' value chain activity?",
+                options: [
+                    "To ensure services deliver expected benefits",
+                    "To ensure a shared understanding of vision, status, and improvement directions for all products and services",
+                    "To handle customer requests and complaints",
+                    "To design new or changed services"
+                ],
+                correctIndex: 1,
+                explanation: "The primary purpose of the 'plan' value chain activity is to ensure a shared understanding of the vision, current status, and improvement directions for all products and services across the organization. This activity coordinates efforts across the organization to achieve strategic objectives.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What does the 'optimize and automate' guiding principle recommend?",
+                options: [
+                    "Replace all manual activities with automation",
+                    "Maximize cost efficiency over service quality",
+                    "Use human intervention only when absolutely necessary",
+                    "Use technology appropriately to achieve optimal results after addressing constraints"
+                ],
+                correctIndex: 3,
+                explanation: "The 'optimize and automate' guiding principle recommends using technology appropriately to achieve optimal results after addressing organizational, process, or resource constraints. This principle emphasizes that optimization should come before automation, and that automation should be applied where it adds value.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which ITIL practice aims to ensure authorized users have the right access to services?",
+                options: [
+                    "Service level management",
+                    "Service desk",
+                    "Service request management",
+                    "Access management"
+                ],
+                correctIndex: 3,
+                explanation: "Access management aims to ensure that authorized users have the right access to services, while preventing access by unauthorized users. This practice manages the identity and entitlements of users to provide appropriate access to services, data, and facilities based on policies and roles.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the BEST description of the 'Organizations and people' dimension of service management?",
+                options: [
+                    "The formal organizational structure, job descriptions, and accountability",
+                    "How people work together to deliver services",
+                    "The roles, responsibilities, knowledge, and skills to deliver and consume services",
+                    "The management hierarchy and staff allocation within the service provider"
+                ],
+                correctIndex: 2,
+                explanation: "The 'Organizations and people' dimension encompasses the roles, responsibilities, knowledge, and skills needed to deliver and consume services effectively. It considers both service provider and consumer organizations and includes aspects of culture, staffing, competencies, and leadership required for successful service management.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which of the following activities would BEST be handled by the service desk practice?",
+                options: [
+                    "Identifying the root cause of recurring technical issues",
+                    "Providing a point of communication for users and handling service requests and incidents",
+                    "Creating and testing new service releases",
+                    "Negotiating service level agreements with customers"
+                ],
+                correctIndex: 1,
+                explanation: "Providing a point of communication for users and handling service requests and incidents is the key purpose of the service desk practice. The service desk serves as the primary point of contact for users when they need help, have questions, or want to request standard services.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the main purpose of workforce and talent management practice?",
+                options: [
+                    "To ensure that the organization has the right people with the appropriate skills and knowledge at the right price",
+                    "To focus exclusively on recruiting IT specialists",
+                    "To reduce staff turnover and personnel costs",
+                    "To ensure compliance with employment regulations"
+                ],
+                correctIndex: 0,
+                explanation: "The main purpose of workforce and talent management practice is to ensure that the organization has the right people with the appropriate skills and knowledge at the right price. This practice focuses on all aspects of people management including recruitment, development, retention, and performance optimization to support service delivery.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which statement BEST describes the 'co-creation of value' in ITIL 4?",
+                options: [
+                    "The service provider is solely responsible for delivering value to customers",
+                    "Value is created when customers use the service, combining it with their own resources",
+                    "Value is defined exclusively by the technical aspects of service delivery",
+                    "Value is determined by the cost of delivering the service"
+                ],
+                correctIndex: 1,
+                explanation: "Co-creation of value means that value is created when customers use the service, combining it with their own resources. This concept recognizes that value is not simply delivered by the provider, but rather emerges from the active collaboration between provider and consumer, with each contributing resources and capabilities.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which practice is primarily concerned with identifying service risks and taking steps to avoid, transfer, or mitigate them?",
+                options: [
+                    "Change enablement",
+                    "Risk management",
+                    "Problem management",
+                    "Information security management"
+                ],
+                correctIndex: 1,
+                explanation: "Risk management is primarily concerned with identifying service risks and taking steps to avoid, transfer, or mitigate them. This practice focuses on understanding uncertainty and its potential positive or negative effects on objectives, and making informed decisions about how to address risks at all levels of the organization.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the BEST description of a service offering?",
+                options: [
+                    "A formal agreement between a service provider and customer",
+                    "A description of one or more services designed to address the needs of a target consumer group",
+                    "The financial breakdown of service costs",
+                    "A list of all services provided by an organization"
+                ],
+                correctIndex: 1,
+                explanation: "A service offering is a description of one or more services designed to address the needs of a target consumer group. It includes the goods, access to resources, and service actions that address specific customer needs, along with any additional services that support or enhance the core offering.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the primary difference between an incident and a problem in ITIL 4?",
+                options: [
+                    "Incidents affect multiple users, while problems affect only individual users",
+                    "Incidents are caused by technical failures, while problems are caused by human error",
+                    "Incidents are unplanned service disruptions or quality reductions, while problems are the causes of one or more incidents",
+                    "Incidents require immediate response, while problems can always be addressed with standard timeframes"
+                ],
+                correctIndex: 2,
+                explanation: "The primary difference is that incidents are unplanned service disruptions or quality reductions, while problems are the causes of one or more incidents. Incident management focuses on restoring service as quickly as possible, while problem management seeks to identify, analyze, and resolve the underlying causes to prevent recurrence.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which value chain activity ensures that products and services continually meet stakeholder expectations for quality, costs, and time-to-market?",
+                options: [
+                    "Deliver and support",
+                    "Design and transition",
+                    "Engage",
+                    "Improve"
+                ],
+                correctIndex: 1,
+                explanation: "The 'Design and transition' value chain activity ensures that products and services continually meet stakeholder expectations for quality, costs, and time-to-market. This activity focuses on designing services, products, and entire value streams to meet requirements and enable effective delivery.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What does the 'four dimensions of service management' model ensure?",
+                options: [
+                    "That all financial aspects of service delivery are properly accounted for",
+                    "That a holistic approach is taken to service management, considering multiple perspectives",
+                    "That service levels meet customer expectations",
+                    "That appropriate technologies are selected for service delivery"
+                ],
+                correctIndex: 1,
+                explanation: "The four dimensions of service management model ensures that a holistic approach is taken to service management, considering multiple perspectives. It helps organizations address service management comprehensively by considering organizations and people, information and technology, partners and suppliers, and value streams and processes.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which of the following is the BEST example of a service relationship?",
+                options: [
+                    "A detailed technical specification for service requirements",
+                    "A one-time purchase of hardware equipment",
+                    "An ongoing collaboration between an IT department and a business unit to support business processes",
+                    "A project plan for implementing new software"
+                ],
+                correctIndex: 2,
+                explanation: "An ongoing collaboration between an IT department and a business unit to support business processes is the best example of a service relationship. Service relationships involve continuous cooperation between service providers and service consumers, with both parties working together to create value through the service.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the purpose of the deployment management practice?",
+                options: [
+                    "To move new or changed hardware, software, documentation, processes to live environments",
+                    "To ensure that risks are properly assessed before making changes",
+                    "To design new service offerings based on business requirements",
+                    "To track and report on the performance of technology components"
+                ],
+                correctIndex: 0,
+                explanation: "The purpose of deployment management practice is to move new or changed hardware, software, documentation, processes, or any other component to live environments. This practice focuses on the actual implementation of components into production, ensuring they are correctly installed and configured to work as intended.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which concept describes an activity that converts inputs to outputs and defines what needs to be done, by whom, when, where, why, and how?",
+                options: [
+                    "Practice",
+                    "Value",
+                    "Process",
+                    "Function"
+                ],
+                correctIndex: 2,
+                explanation: "A process describes an activity that converts inputs to outputs and defines what needs to be done, by whom, when, where, why, and how. Processes are typically a coordinated set of activities designed to accomplish a specific objective, with defined inputs, outputs, and roles.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What does the 'think and work holistically' guiding principle emphasize?",
+                options: [
+                    "Breaking complex systems down into smaller independent components",
+                    "Working in a way that provides visibility of all aspects of service delivery",
+                    "The need to consider all elements in a coordinated way when managing services",
+                    "Focusing primarily on customer satisfaction metrics"
+                ],
+                correctIndex: 2,
+                explanation: "The 'think and work holistically' guiding principle emphasizes the need to consider all elements in a coordinated way when managing services. This principle recognizes that services are complex systems requiring coordination of various components, including people, processes, technology, partners, and other resources to deliver value.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is the BEST description of 'consumer' in the ITIL service relationship model?",
+                options: [
+                    "The individual who pays for the service",
+                    "Only the end users of a service",
+                    "The group that receives goods or services",
+                    "The organization's executive management"
+                ],
+                correctIndex: 2,
+                explanation: "In the ITIL service relationship model, a 'consumer' is best described as the group that receives goods or services. This can include customers (who define requirements and have responsibility for outcomes), users (who directly use the service), and sponsors (who authorize budget for service consumption).",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is a 'change schedule' in change enablement practice?",
+                options: [
+                    "A document listing the steps required to implement a change",
+                    "A log of all changes that have been implemented",
+                    "A documented plan of authorized changes and their planned implementation dates",
+                    "A timesheet recording hours spent implementing changes"
+                ],
+                correctIndex: 2,
+                explanation: "A change schedule in change enablement practice is a documented plan of authorized changes and their planned implementation dates. It provides visibility of upcoming changes to help coordinate activities, manage conflicts, and ensure appropriate resources are available for successful deployment.",
+                domain: "Service Management Practices"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
