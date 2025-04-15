@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">10</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">10</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Which of the following BEST describes how the 'service value chain' works in ITIL 4?",
+                options: [
+                    "It's a linear sequence of activities that must be followed in order",
+                    "It's a flexible operating model where activities can be combined in different orders",
+                    "It's a hierarchical structure defining who reports to whom",
+                    "It's a financial model for calculating service costs"
+                ],
+                correctIndex: 1,
+                explanation: "The service value chain is a flexible operating model where activities can be combined in different orders. Unlike a linear process, it's designed to be adaptable - activities can be sequenced and combined in multiple ways depending on the specific need or scenario. This flexibility allows organizations to respond effectively to different types of demand while maintaining consistency in how value is created.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What is a key characteristic of high-velocity IT environments according to ITIL 4?",
+                options: [
+                    "Focus on following traditional processes without deviation",
+                    "Emphasis on documentation over collaboration",
+                    "Rapid delivery of IT services with frequent change and integration",
+                    "Preference for large, infrequent releases over continuous updates"
+                ],
+                correctIndex: 2,
+                explanation: "A key characteristic of high-velocity IT environments is the rapid delivery of IT services with frequent change and integration. These environments are characterized by quick, iterative development cycles, continuous integration and deployment, and automation - enabling organizations to respond rapidly to changing business needs while maintaining reliability and security.",
+                domain: "High-Velocity IT"
+            },
+            {
+                question: "In ITIL 4, what is the relationship between 'practices' and 'processes'?",
+                options: [
+                    "They are different terms for the same concept",
+                    "Practices are broader organizational capabilities that may include multiple processes",
+                    "Processes have replaced practices in ITIL 4",
+                    "Practices are specific technical activities while processes are management activities"
+                ],
+                correctIndex: 1,
+                explanation: "In ITIL 4, practices are broader organizational capabilities that may include multiple processes. A practice is a complete organizational capability including people, processes, tools, information, and other resources. Processes are just one element within a practice - they define sequences of actions with inputs and outputs. This broader view acknowledges that effective service management requires more than just well-defined processes.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the BEST description of the relationship between 'customers' and 'users' in ITIL 4?",
+                options: [
+                    "These terms refer to the same role and are used interchangeably",
+                    "Customers pay for services while users consume them, but they can be the same person",
+                    "Customers always work in business departments while users are always in IT",
+                    "Users define requirements while customers test that services meet requirements"
+                ],
+                correctIndex: 1,
+                explanation: "In ITIL 4, customers pay for services while users consume them, but they can be the same person. Customers are responsible for defining requirements, authorizing budget, and ensuring outcomes are achieved, while users are those who directly use the service. In some cases, the same person can act as both customer and user, but in many organizations, these are distinct roles with different responsibilities and perspectives.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which practice focuses on ensuring services deliver the outcomes customers expect?",
+                options: [
+                    "Service level management",
+                    "Service request management",
+                    "Service desk",
+                    "Deployment management"
+                ],
+                correctIndex: 0,
+                explanation: "Service level management focuses on ensuring services deliver the outcomes customers expect. This practice involves setting clear targets for service performance and quality, negotiating agreements, monitoring achievement against those targets, and reporting on service levels. It creates a common understanding between provider and customer about what constitutes success and ensures services are designed and delivered to meet those expectations.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which ITIL guiding principle recommends making small incremental improvements rather than attempting large transformations all at once?",
+                options: [
+                    "Focus on value",
+                    "Progress iteratively with feedback",
+                    "Collaborate and promote visibility",
+                    "Think and work holistically"
+                ],
+                correctIndex: 1,
+                explanation: "The 'Progress iteratively with feedback' guiding principle recommends making small incremental improvements rather than attempting large transformations all at once. This principle advocates organizing work into smaller, manageable sections that can be executed and completed in a timely manner, seeking feedback on each iteration to learn and improve continuously, rather than attempting big bang changes that carry higher risk and complexity.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which statement BEST describes the purpose of the 'Engage' value chain activity?",
+                options: [
+                    "Building IT services according to specifications",
+                    "Understanding stakeholder needs and establishing relationships",
+                    "Ensuring continuous improvement of all practices",
+                    "Deploying new service releases to production"
+                ],
+                correctIndex: 1,
+                explanation: "The purpose of the 'Engage' value chain activity is understanding stakeholder needs and establishing relationships. This activity focuses on providing a good understanding of stakeholder needs, ensuring transparency, and maintaining good relationships with all stakeholders. It serves as a connection point between stakeholders and service provider activities, ensuring that services meet actual needs and expectations.",
+                domain: "Service Value System"
+            },
+            {
+                question: "When implementing 'continual improvement' in an organization, what should be the FIRST step?",
+                options: [
+                    "Conduct a detailed baseline assessment",
+                    "Identify what metrics to measure",
+                    "Identify the vision and where you want to be",
+                    "Implement improvement actions"
+                ],
+                correctIndex: 2,
+                explanation: "When implementing continual improvement, the first step should be to identify the vision and where you want to be. Establishing a clear vision creates purpose and direction for improvement efforts. Without first understanding where you want to go, other steps like baselines and metrics lack proper context. The continual improvement model follows: 1) What's the vision? 2) Where are we now? 3) Where do we want to be? 4) How do we get there? 5) Take action 6) Did we get there? 7) How do we keep the momentum?",
+                domain: "Continual Improvement"
+            },
+            {
+                question: "Which of these would be considered a direct measure of value in ITIL 4?",
+                options: [
+                    "Number of incidents handled by the service desk",
+                    "Percentage uptime of a system",
+                    "Achievement of business outcomes enabled by a service",
+                    "Speed of change implementation"
+                ],
+                correctIndex: 2,
+                explanation: "The achievement of business outcomes enabled by a service would be considered a direct measure of value in ITIL 4. ITIL defines value as the perceived benefits, usefulness, and importance of something. Direct measures of value focus on outcomes achieved rather than on operational metrics. While metrics like uptime and incident resolution are important, they are indirect measures that contribute to value but don't directly measure it.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is a key focus of the 'relationship management' practice in ITIL 4?",
+                options: [
+                    "Managing technical relationships between system components",
+                    "Establishing and nurturing links between the organization and its stakeholders",
+                    "Handling user complaints and feedback",
+                    "Managing contracts with external suppliers only"
+                ],
+                correctIndex: 1,
+                explanation: "A key focus of relationship management practice is establishing and nurturing links between the organization and its stakeholders. This practice identifies, analyzes, monitors, and continually improves relationships with and between stakeholders to ensure alignment between stakeholders and service provider strategies and objectives. It's concerned with all stakeholder relationships, not just suppliers, and aims to establish mutual trust.",
+                domain: "Service Management Practices"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            document.getElementById('total').textContent = quizData.length;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
