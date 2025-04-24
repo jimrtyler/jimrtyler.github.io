@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the BEST definition of a 'utility' in ITIL 4?",
+                options: [
+                    "The functionality offered by a service",
+                    "The guaranteed uptime of a service",
+                    "The overall value of the service to the business",
+                    "The price customers pay for a service"
+                ],
+                correctIndex: 0,
+                explanation: "In ITIL 4, 'utility' refers to the functionality offered by a service or what the service does. It's about the service's ability to perform as needed to meet requirements and contribute to outcomes desired by users. This contrasts with 'warranty,' which refers to how well the service performs.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which practice is primarily concerned with moving changes into the live environment?",
+                options: [
+                    "Problem management",
+                    "Release management",
+                    "Change enablement",
+                    "Service request management"
+                ],
+                correctIndex: 1,
+                explanation: "Release management is primarily concerned with moving changes into the live environment. This practice focuses on planning, scheduling, and controlling the build, test, and deployment of releases to deliver new functionality while protecting existing services.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which guiding principle emphasizes making decisions that will remain useful over time?",
+                options: [
+                    "Think and work holistically",
+                    "Progress iteratively with feedback",
+                    "Keep it simple and practical",
+                    "Optimize and automate"
+                ],
+                correctIndex: 2,
+                explanation: "The 'Keep it simple and practical' guiding principle emphasizes making decisions that will remain useful over time. It encourages organizations to eliminate anything that is unnecessarily complex and to focus on delivering practical solutions that meet requirements efficiently.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is the primary purpose of the problem management practice?",
+                options: [
+                    "To restore normal service operation as quickly as possible",
+                    "To reduce the likelihood and impact of incidents by identifying actual and potential causes of incidents",
+                    "To manage all user service requests",
+                    "To ensure all changes are properly recorded and authorized"
+                ],
+                correctIndex: 1,
+                explanation: "The primary purpose of the problem management practice is to reduce the likelihood and impact of incidents by identifying actual and potential causes of incidents. This practice focuses on finding and addressing the root causes of incidents to prevent recurrence and minimize impact to the business.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which component of the Service Value System directly interacts with customers to understand their needs?",
+                options: [
+                    "Practices",
+                    "Service value chain",
+                    "Governance",
+                    "Guiding principles"
+                ],
+                correctIndex: 1,
+                explanation: "The service value chain, specifically through its 'Engage' activity, directly interacts with customers to understand their needs. This activity focuses on providing a good understanding of stakeholder needs, ensuring transparency, and maintaining good relationships with all stakeholders.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following is an example of a service request?",
+                options: [
+                    "A user reports that an application is not responding",
+                    "A user asks for help interpreting an error message",
+                    "A user requests a new laptop",
+                    "A user reports that a data center has lost power"
+                ],
+                correctIndex: 2,
+                explanation: "A user requesting a new laptop is an example of a service request. Service requests are formal requests from users for something to be provided, such as access to resources, fulfillment of standard changes, or information. They are typically pre-approved, routine activities that follow a standard procedure.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the primary focus of the 'design and transition' value chain activity?",
+                options: [
+                    "Creating new services or improving existing ones",
+                    "Gathering user requirements",
+                    "Resolving service issues",
+                    "Managing supplier relationships"
+                ],
+                correctIndex: 0,
+                explanation: "The primary focus of the 'design and transition' value chain activity is creating new services or improving existing ones. This activity ensures that products and services continually meet stakeholder expectations for quality, costs, and time to market.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which dimension of service management focuses on how different organizations interact to create value?",
+                options: [
+                    "Organizations and people",
+                    "Information and technology",
+                    "Partners and suppliers",
+                    "Value streams and processes"
+                ],
+                correctIndex: 2,
+                explanation: "The 'Partners and suppliers' dimension focuses on how different organizations interact to create value. This dimension considers the relationships between organizations involved in service provision and how these interactions contribute to service delivery.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the purpose of IT asset management practice?",
+                options: [
+                    "To improve service quality by tracking user issues",
+                    "To secure the organization from cyber threats",
+                    "To plan and manage the full lifecycle of IT assets",
+                    "To ensure service availability during peak usage"
+                ],
+                correctIndex: 2,
+                explanation: "The purpose of IT asset management practice is to plan and manage the full lifecycle of IT assets. This practice focuses on tracking and managing the financial, contractual, and inventory details of IT assets throughout their lifecycle to optimize value and manage risks.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which guiding principle recommends using existing services, processes, and tools before creating new ones?",
+                options: [
+                    "Focus on value",
+                    "Start where you are",
+                    "Progress iteratively with feedback",
+                    "Collaborate and promote visibility"
+                ],
+                correctIndex: 1,
+                explanation: "The 'Start where you are' guiding principle recommends using existing services, processes, and tools before creating new ones. It encourages organizations to examine what can be reused from existing resources before investing in new solutions, helping to maximize efficiency and effectiveness.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is 'warranty' in the context of ITIL 4 service value?",
+                options: [
+                    "The legal guarantee for service quality",
+                    "The technical capabilities of a service",
+                    "The ability of a service to perform as promised",
+                    "The cost of service delivery"
+                ],
+                correctIndex: 2,
+                explanation: "In ITIL 4, 'warranty' refers to the ability of a service to perform as promised. It's about how well the service performs and includes aspects like availability, capacity, security, and continuity. Warranty assures that the service will meet agreed requirements under normal circumstances.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which practice is responsible for recording and managing the lifecycle of all service configurations?",
+                options: [
+                    "Service catalog management",
+                    "Service configuration management",
+                    "IT asset management",
+                    "Relationship management"
+                ],
+                correctIndex: 1,
+                explanation: "Service configuration management is responsible for recording and managing the lifecycle of all service configurations. This practice maintains information about configuration items required to deliver services and their relationships, ensuring this information is accurate and available when needed.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "In which value chain activity would you find service desk operations?",
+                options: [
+                    "Engage",
+                    "Design and transition",
+                    "Obtain/build",
+                    "Deliver and support"
+                ],
+                correctIndex: 3,
+                explanation: "Service desk operations are found in the 'Deliver and support' value chain activity. This activity focuses on ensuring services are delivered and supported according to specifications and stakeholders' expectations, including handling day-to-day operations and user support through the service desk.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What is the BEST description of a Major Incident?",
+                options: [
+                    "Any incident that affects more than one user",
+                    "An incident with significant impact on business operations that demands an urgent response",
+                    "Any incident that requires a change to resolve",
+                    "An incident that has been escalated to senior management"
+                ],
+                correctIndex: 1,
+                explanation: "A Major Incident is best described as an incident with significant impact on business operations that demands an urgent response. Major Incidents typically affect critical services, have widespread impact, and require elevated priority and coordinated resolution efforts beyond standard incident management procedures.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which ITIL practice is concerned with understanding user needs and ensuring products and services meet them?",
+                options: [
+                    "Relationship management",
+                    "Business analysis",
+                    "Service level management",
+                    "Supplier management"
+                ],
+                correctIndex: 1,
+                explanation: "Business analysis is concerned with understanding user needs and ensuring products and services meet them. This practice focuses on analyzing business requirements, identifying business issues and opportunities, and ensuring solutions align with business objectives and stakeholder needs.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What describes the criticality of an incident?",
+                options: [
+                    "How many users are affected",
+                    "The impact and urgency",
+                    "How long it takes to resolve",
+                    "The technical complexity"
+                ],
+                correctIndex: 1,
+                explanation: "The criticality of an incident is described by its impact and urgency. Impact measures the effect on business processes or IT services, while urgency represents how quickly a resolution is required. Together, they determine the incident's priority for handling and resolution.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which component of the ITIL Service Value System ensures that the organization operates effectively across all parts?",
+                options: [
+                    "Governance",
+                    "Continual improvement",
+                    "Guiding principles",
+                    "Practices"
+                ],
+                correctIndex: 0,
+                explanation: "Governance ensures that the organization operates effectively across all parts. It represents the system by which an organization is directed and controlled, ensuring alignment with stakeholder needs and organizational objectives while balancing value, risk, and resources.",
+                domain: "Service Value System"
+            },
+            {
+                question: "What is the primary focus of the 'progress iteratively with feedback' guiding principle?",
+                options: [
+                    "Using automation whenever possible",
+                    "Organizing work into smaller, manageable sections and seeking feedback to improve",
+                    "Continuously analyzing metrics for improvement",
+                    "Focusing on rapid service deployment"
+                ],
+                correctIndex: 1,
+                explanation: "The primary focus of the 'progress iteratively with feedback' guiding principle is organizing work into smaller, manageable sections and seeking feedback to improve. This approach promotes incremental development, frequent validation, and learning from experience rather than attempting to deliver everything at once.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is a service portfolio?",
+                options: [
+                    "A complete list of all active services",
+                    "A database containing details of all service components",
+                    "A complete set of services managed by a service provider, including those in development, live, and retired",
+                    "A customer-facing view of available services"
+                ],
+                correctIndex: 2,
+                explanation: "A service portfolio is a complete set of services managed by a service provider, including those in development, live, and retired. It includes the service pipeline (planned or in development), service catalog (current services), and retired services, providing a comprehensive view of service investments across their lifecycle.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which value chain activity ensures continual improvement of products, services, and practices?",
+                options: [
+                    "Plan",
+                    "Improve",
+                    "Engage",
+                    "Design and transition"
+                ],
+                correctIndex: 1,
+                explanation: "The 'Improve' value chain activity ensures continual improvement of products, services, and practices. This activity focuses on ensuring all components of the service value system continue to evolve and improve across all value chain activities and practices to meet changing business needs.",
+                domain: "Service Value System"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>

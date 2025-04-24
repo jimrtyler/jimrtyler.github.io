@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">10</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">10</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the primary purpose of the service validation and testing practice?",
+                options: [
+                    "To evaluate suppliers against contract requirements",
+                    "To ensure a service will provide value to customers and be fit for purpose",
+                    "To identify security vulnerabilities in applications",
+                    "To implement changes to live services"
+                ],
+                correctIndex: 1,
+                explanation: "The primary purpose of service validation and testing practice is to ensure a service will provide value to customers and be fit for purpose. This practice focuses on verifying that services meet design specifications and requirements, and also validating that they deliver the expected outcomes and value. It helps ensure services are reliable, usable, and meet stakeholder expectations before being released.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which ITIL 4 concept describes the joint activities performed by a service provider and a service consumer to ensure continual value co-creation?",
+                options: [
+                    "Value chain",
+                    "Value stream",
+                    "Service relationship",
+                    "Service offering"
+                ],
+                correctIndex: 2,
+                explanation: "A service relationship describes the joint activities performed by a service provider and a service consumer to ensure continual value co-creation. This concept emphasizes that service provision is not a one-way delivery but a collaborative relationship where both parties work together to create and realize value. Service relationships include service provision, service consumption, and relationship management activities.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the purpose of the 'deliver and support' value chain activity?",
+                options: [
+                    "To design new service offerings",
+                    "To ensure services are delivered and supported according to specifications",
+                    "To negotiate with external suppliers",
+                    "To define organizational strategy"
+                ],
+                correctIndex: 1,
+                explanation: "The purpose of the 'deliver and support' value chain activity is to ensure services are delivered and supported according to specifications. This activity focuses on providing services to agreed service levels, handling service requests, managing service issues, and restoring normal service operation after incidents. It's where day-to-day service operations happen, including service desk and operational management.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following would BEST be addressed by the availability management practice?",
+                options: [
+                    "Ensuring that services can meet agreed performance requirements",
+                    "Tracking the financial value of IT assets",
+                    "Identifying and managing security threats",
+                    "Eliminating waste in service processes"
+                ],
+                correctIndex: 0,
+                explanation: "Ensuring that services can meet agreed performance requirements would best be addressed by the availability management practice. This practice works to ensure services deliver the levels of availability needed by the customer to achieve their business objectives. It focuses on ensuring the right level of availability based on customer needs, not just maximum uptime, and includes planning, measurement, and improvement activities.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "In ITIL 4, which of the following is a key characteristic of emergency changes?",
+                options: [
+                    "They must always be approved by the Change Advisory Board",
+                    "They must be implemented within 24 hours of request",
+                    "They typically need to be assessed and implemented very quickly",
+                    "They are always related to security vulnerabilities"
+                ],
+                correctIndex: 2,
+                explanation: "A key characteristic of emergency changes is that they typically need to be assessed and implemented very quickly. Emergency changes address issues that require immediate action to restore or maintain critical services or prevent significant negative business impact. Due to their urgency, they often follow an expedited process with streamlined approval, though they still require proper assessment, documentation, and control.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is a Change Authority in the context of change enablement?",
+                options: [
+                    "A software tool used to process change requests",
+                    "A document that specifies change procedures",
+                    "A person or group responsible for authorizing a change",
+                    "A testing environment for validating changes"
+                ],
+                correctIndex: 2,
+                explanation: "A Change Authority is a person or group responsible for authorizing a change. Change authorities make decisions about whether to approve, reject, or defer change requests based on business risks, impacts, and benefits. Different types of changes might have different change authorities, with more significant or risky changes typically requiring approval from higher-level authorities.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which service management dimension is concerned with skills, competencies, roles, and responsibilities?",
+                options: [
+                    "Organizations and people",
+                    "Information and technology",
+                    "Partners and suppliers",
+                    "Value streams and processes"
+                ],
+                correctIndex: 0,
+                explanation: "The 'Organizations and people' dimension is concerned with skills, competencies, roles, and responsibilities. This dimension focuses on the human aspects of service management, including organizational structures, roles, responsibilities, skills, competencies, teams, and individual knowledge. It addresses how these human factors contribute to value creation and service delivery.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the BEST description of the 'keep it simple and practical' guiding principle?",
+                options: [
+                    "Always implement the simplest possible solution",
+                    "Use the minimum number of steps in a process",
+                    "Eliminate complexity by removing controls and checks",
+                    "Use the minimum number of steps necessary to accomplish an objective"
+                ],
+                correctIndex: 3,
+                explanation: "The best description of the 'keep it simple and practical' guiding principle is to use the minimum number of steps necessary to accomplish an objective. This principle emphasizes removing unnecessary complexity while ensuring controls, processes, and procedures are sufficient to achieve their objectives. It focuses on practical outcomes rather than theoretical perfection, and aims for solutions that remain useful over time.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which approach to improvement does the 'continual improvement' practice recommend?",
+                options: [
+                    "Making large, infrequent improvements to minimize disruption",
+                    "Focusing only on improving technology aspects of services",
+                    "A gradual, ongoing approach where small improvements accumulate over time",
+                    "Waiting until problems occur before making improvements"
+                ],
+                correctIndex: 2,
+                explanation: "The 'continual improvement' practice recommends a gradual, ongoing approach where small improvements accumulate over time. This approach recognizes that improvement should be a constant focus rather than a periodic activity. It emphasizes making regular, smaller improvements across all areas of the organization rather than waiting for large transformation initiatives, helping to embed improvement as part of the organizational culture.",
+                domain: "Continual Improvement"
+            },
+            {
+                question: "What is the BEST description of how 'governance' functions within the ITIL Service Value System?",
+                options: [
+                    "It provides the means to evaluate, direct, and monitor activities",
+                    "It specifies the detailed steps in service delivery processes",
+                    "It is concerned only with financial management",
+                    "It focuses exclusively on strategic planning"
+                ],
+                correctIndex: 0,
+                explanation: "Governance functions within the ITIL Service Value System by providing the means to evaluate, direct, and monitor activities. It represents the system by which an organization is directed and controlled, ensuring alignment with stakeholder needs while balancing value creation with risk management. Governance establishes clear roles, responsibilities, and authority for decision-making at appropriate levels within the organization.",
+                domain: "Service Value System"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            document.getElementById('total').textContent = quizData.length;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>

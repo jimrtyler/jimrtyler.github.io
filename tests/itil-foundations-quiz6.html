@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">20</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">20</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "Which of the following BEST describes the purpose of the 'continual improvement' component in the ITIL Service Value System?",
+                options: [
+                    "It focuses exclusively on improving IT services",
+                    "It ensures that all organizational components work together to create value",
+                    "It enables organizations to continually improve products, services, and practices across all value chain activities",
+                    "It manages relationships with external service providers"
+                ],
+                correctIndex: 2,
+                explanation: "The purpose of continual improvement in the ITIL Service Value System is to enable organizations to continually improve products, services, and practices across all value chain activities. It's not limited to just IT services but encompasses all aspects of the organization that contribute to value creation.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following BEST describes the relationship between a problem and an incident?",
+                options: [
+                    "A problem is the cause of one or more incidents",
+                    "A problem is always more severe than an incident",
+                    "An incident always causes multiple problems",
+                    "A problem is always reported by users, while incidents are detected by monitoring tools"
+                ],
+                correctIndex: 0,
+                explanation: "A problem is the cause of one or more incidents. Problem management focuses on identifying and managing the causes of incidents, while incident management deals with restoring service as quickly as possible regardless of the underlying cause.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the purpose of the 'engage' value chain activity?",
+                options: [
+                    "To provide transparency and good relationships with stakeholders",
+                    "To ensure continuous improvement of services",
+                    "To design and implement service components",
+                    "To deliver services to agreed specifications"
+                ],
+                correctIndex: 0,
+                explanation: "The purpose of the 'engage' value chain activity is to provide transparency and maintain good relationships with all stakeholders. It focuses on understanding stakeholder needs, ensuring transparent communication, and fostering strong relationships with customers, users, and other important stakeholders.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following is a key aspect of the 'focus on value' guiding principle?",
+                options: [
+                    "Implementing automation wherever possible",
+                    "Understanding how service consumers define value",
+                    "Maintaining comprehensive documentation",
+                    "Creating detailed metrics for all processes"
+                ],
+                correctIndex: 1,
+                explanation: "A key aspect of the 'focus on value' guiding principle is understanding how service consumers define value. This principle emphasizes that all activities should contribute to value for stakeholders, and this requires understanding their perspective on what constitutes value.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is the primary purpose of the change enablement practice?",
+                options: [
+                    "To maximize the number of successful service and product changes",
+                    "To accelerate the implementation of all changes",
+                    "To eliminate the need for human approval of changes",
+                    "To replace the change advisory board with automated tools"
+                ],
+                correctIndex: 0,
+                explanation: "The primary purpose of the change enablement practice is to maximize the number of successful service and product changes by ensuring risks have been properly assessed, authorizing changes to proceed, and managing the change schedule. It focuses on enabling beneficial changes while minimizing disruption.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which of the following BEST describes what a configuration item (CI) is?",
+                options: [
+                    "Any component that needs to be managed in order to deliver an IT service",
+                    "The technical documentation for an IT service",
+                    "A request for a new or changed service from users",
+                    "A record of system failures and their resolutions"
+                ],
+                correctIndex: 0,
+                explanation: "A configuration item (CI) is any component that needs to be managed in order to deliver an IT service. CIs can include hardware, software, documentation, personnel, and any other component that contributes to service delivery and needs to be tracked and managed.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which guiding principle emphasizes integrating various organizational functions in service management?",
+                options: [
+                    "Start where you are",
+                    "Think and work holistically",
+                    "Keep it simple and practical",
+                    "Collaborate and promote visibility"
+                ],
+                correctIndex: 1,
+                explanation: "The 'Think and work holistically' guiding principle emphasizes integrating various organizational functions in service management. It recognizes that services are complex systems that require coordination across different functional areas to deliver value effectively.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is the MAIN focus of the 'obtain/build' value chain activity?",
+                options: [
+                    "Ensuring that service components meet specifications and stakeholder requirements",
+                    "Managing user requests and responding to issues",
+                    "Creating and maintaining relationships with stakeholders",
+                    "Planning organizational activities to achieve objectives"
+                ],
+                correctIndex: 0,
+                explanation: "The main focus of the 'obtain/build' value chain activity is ensuring that service components meet specifications and stakeholder requirements. This activity involves acquiring, developing, or otherwise obtaining service components that will be needed for service design, transition, and delivery.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which practice is responsible for handling standard service requests from users?",
+                options: [
+                    "Incident management",
+                    "Service level management",
+                    "Service request management",
+                    "Problem management"
+                ],
+                correctIndex: 2,
+                explanation: "Service request management is responsible for handling standard service requests from users. This practice focuses on fulfilling requests that follow a predefined process and typically represent standard changes or information requests, such as password resets, software installation, or equipment provisioning.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the purpose of the 'Information and technology' dimension of service management?",
+                options: [
+                    "To focus exclusively on IT hardware infrastructure",
+                    "To address the information, knowledge, and technologies used for service management",
+                    "To define service level requirements",
+                    "To document the roles and responsibilities of service personnel"
+                ],
+                correctIndex: 1,
+                explanation: "The purpose of the 'Information and technology' dimension of service management is to address the information, knowledge, and technologies used for service management. This dimension covers all information created, managed, and used in service provision, as well as the technologies that support and enable services.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which term describes the practice of identifying, prioritizing, and addressing causes of service issues and preventing their recurrence?",
+                options: [
+                    "Incident management",
+                    "Service request management",
+                    "Problem management",
+                    "Change enablement"
+                ],
+                correctIndex: 2,
+                explanation: "Problem management is the practice of identifying, prioritizing, and addressing causes of service issues and preventing their recurrence. It focuses on finding root causes of incidents, documenting known errors, and implementing permanent solutions or workarounds to minimize impact.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is a known error in ITIL?",
+                options: [
+                    "An incident that has been resolved but might recur",
+                    "A problem that has been analyzed but not resolved",
+                    "A service request that cannot be fulfilled",
+                    "A change that has failed implementation"
+                ],
+                correctIndex: 1,
+                explanation: "A known error in ITIL is a problem that has been analyzed but not resolved. It represents a problem where the root cause is understood and a workaround or permanent solution may have been identified, but the problem has not yet been eliminated completely.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which of the following statements BEST describes the relationship between value, outcomes, costs, and risks?",
+                options: [
+                    "Organizations always prioritize outcomes over costs and risks",
+                    "Value is created when outcomes are achieved with minimal costs and risks",
+                    "Costs and risks are always reduced when focusing on outcomes",
+                    "Value is only created when services are delivered at the lowest possible cost"
+                ],
+                correctIndex: 1,
+                explanation: "Value is created when outcomes are achieved with minimal costs and risks. This reflects the balance organizations must maintain between achieving desired outcomes while managing costs and risks effectively. Value creation involves optimizing this balance rather than simply minimizing costs or eliminating all risks.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the purpose of the service level management practice?",
+                options: [
+                    "To identify the root cause of service failures",
+                    "To restore normal service operation as quickly as possible",
+                    "To set clear business-based targets for service performance",
+                    "To implement changes with minimum disruption to services"
+                ],
+                correctIndex: 2,
+                explanation: "The purpose of the service level management practice is to set clear business-based targets for service performance. This practice focuses on establishing, monitoring, and managing service level agreements (SLAs) that define the expected service levels and ensure services meet the agreed performance requirements.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which dimension of service management considers workflows, controls, and procedures needed to deliver services?",
+                options: [
+                    "Organizations and people",
+                    "Information and technology",
+                    "Partners and suppliers",
+                    "Value streams and processes"
+                ],
+                correctIndex: 3,
+                explanation: "The 'Value streams and processes' dimension considers workflows, controls, and procedures needed to deliver services. This dimension focuses on how various activities work together to facilitate value creation, including the specific ways in which resources are organized to deliver services efficiently and effectively.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "What is the main purpose of the service catalog management practice?",
+                options: [
+                    "To provide and maintain accurate information about all services and service offerings in the service catalog",
+                    "To ensure all incidents are recorded and resolved",
+                    "To manage supplier and contract negotiations",
+                    "To define service level agreements with customers"
+                ],
+                correctIndex: 0,
+                explanation: "The main purpose of the service catalog management practice is to provide and maintain accurate information about all services and service offerings in the service catalog. This practice ensures that the service catalog is up-to-date and serves as a reliable single source of information about available services.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the key focus of the 'collaborate and promote visibility' guiding principle?",
+                options: [
+                    "Ensuring all documentation is publicly accessible",
+                    "Working together effectively to achieve objectives and making information available to appropriate stakeholders",
+                    "Providing senior management with oversight of all activities",
+                    "Publishing metrics on service performance to all users"
+                ],
+                correctIndex: 1,
+                explanation: "The key focus of the 'collaborate and promote visibility' guiding principle is working together effectively to achieve objectives and making information available to appropriate stakeholders. This principle emphasizes the importance of collaboration, transparency, and sharing relevant information to enable effective decision-making and service delivery.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "Which of the following BEST describes a value stream?",
+                options: [
+                    "A financial metric that shows the profitability of a service",
+                    "A series of steps an organization undertakes to create and deliver products and services to consumers",
+                    "A stakeholder analysis that defines what various groups value about a service",
+                    "A management technique for tracking service costs"
+                ],
+                correctIndex: 1,
+                explanation: "A value stream is a series of steps an organization undertakes to create and deliver products and services to consumers. It represents the end-to-end flow of activities that deliver value to customers, from demand identification through to value realization.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which ITIL practice aims to reduce the likelihood of incidents by addressing potential infrastructure issues before they occur?",
+                options: [
+                    "Incident management",
+                    "Infrastructure and platform management",
+                    "Monitoring and event management",
+                    "Risk management"
+                ],
+                correctIndex: 2,
+                explanation: "Monitoring and event management aims to reduce the likelihood of incidents by addressing potential infrastructure issues before they occur. This practice systematically observes services and service components to detect events, make sense of them, and determine appropriate responses before they become incidents or cause service disruption.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the primary value of applying the 'start where you are' guiding principle?",
+                options: [
+                    "It promotes the idea that all existing processes should be completely replaced",
+                    "It reduces the time needed for improvement initiatives",
+                    "It ensures accurate measurement of all service metrics",
+                    "It discourages unnecessary service redesign and encourages leveraging existing capabilities"
+                ],
+                correctIndex: 3,
+                explanation: "The primary value of applying the 'start where you are' guiding principle is that it discourages unnecessary service redesign and encourages leveraging existing capabilities. This principle advocates for assessing what works and can be reused before investing in creating new elements, thus optimizing resources and accelerating value delivery.",
+                domain: "Guiding Principles"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
