@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English-Chuj Language Vocabulary Matcher</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        header {
+            background-color: #58cc02;
+            color: white;
+            width: 100%;
+            text-align: center;
+            padding: 20px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .controls {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            max-width: 90%;
+            flex-wrap: wrap;
+            box-sizing: border-box;
+            padding: 0 10px;
+        }
+        
+        .control-group {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            margin: 5px;
+        }
+        
+        .control-group label {
+            margin-right: 5px;
+            white-space: nowrap;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .select-input {
+            padding: 8px;
+            border-radius: 8px;
+            border: 2px solid #e1e1e1;
+            background-color: white;
+            font-size: 14px;
+            cursor: pointer;
+            min-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .game-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        .column {
+            margin: 0 20px;
+            width: 45%;
+            max-width: 400px;
+        }
+        
+        .column-header {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #1cb0f6;
+            font-size: 18px;
+        }
+
+        .card {
+            background-color: white;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            word-break: break-word;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card.selected {
+            background-color: #84d8ff;
+            border-color: #1cb0f6;
+            color: #1cb0f6;
+        }
+
+        .card.match {
+            background-color: #d7ffb8;
+            border-color: #58cc02;
+            color: #58cc02;
+        }
+        
+        .card.incorrect {
+            background-color: #ffb8b8;
+            border-color: #ff4b4b;
+            color: #ff4b4b;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-5px); }
+            80% { transform: translateX(5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .card.fade-out {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .stats-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            min-width: 150px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #777;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1cb0f6;
+            margin-top: 5px;
+        }
+
+        .progress-container {
+            width: 80%;
+            max-width: 400px;
+            margin-top: 20px;
+            background-color: #e1e1e1;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #58cc02;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .btn {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #58cc02;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #46a302;
+        }
+        
+        .btn.secondary {
+            background-color: #1cb0f6;
+        }
+        
+        .btn.secondary:hover {
+            background-color: #0e9cd1;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .column {
+                width: 90%;
+                margin: 10px 0;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .control-group label {
+                margin-bottom: 5px;
+            }
+            
+            .select-input {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 id="header-title">English - Chuj Vocabulary Matcher</h1>
+    </header>
+    
+    <div class="controls">
+        <div class="control-group">
+            <label for="category-select">Vocabulary Category:</label>
+            <select id="category-select" class="select-input">
+                <!-- Category options will be dynamically generated -->
+            </select>
+        </div>
+        <div class="control-group">
+            <label for="difficulty-select">Difficulty:</label>
+            <select id="difficulty-select" class="select-input">
+                <option value="5">Easy (5 pairs)</option>
+                <option value="10" selected>Medium (10 pairs)</option>
+                <option value="15">Hard (15 pairs)</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="game-container">
+        <div class="column">
+            <div id="source-column-header" class="column-header">English</div>
+            <div id="source-column"></div>
+        </div>
+        <div class="column">
+            <div id="target-column-header" class="column-header">Chuj</div>
+            <div id="target-column"></div>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <div class="stat-box">
+            <div class="stat-label">Matched Pairs</div>
+            <div id="matched-counter" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Total Score</div>
+            <div id="score" class="stat-value">0</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-label">Attempts</div>
+            <div id="attempts" class="stat-value">0</div>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+
+    <div class="button-container">
+        <button class="btn" id="new-words-btn">New Words</button>
+        <button class="btn secondary" id="reset-score-btn">Reset Score</button>
+    </div>
+
+    <script>
+        // Language data structure with vocabulary organized by category
+        const languageData = {
+            // Language pair
+            languagePair: {
+                "english-chuj": {
+                    name: "English - Chuj",
+                    sourceLanguage: "english",
+                    targetLanguage: "chuj",
+                    sourceColumnLabel: "English",
+                    targetColumnLabel: "Chuj"
+                }
+            },
+            
+            // Vocabulary categories
+            categories: {
+                "basics": {
+                    name: "Basics",
+                    vocabulary: [
+                        { english: "hello", chuj: "k'inal" },
+                        { english: "goodbye", chuj: "wach'alil" },
+                        { english: "please", chuj: "tz'ib'tej" },
+                        { english: "thank you", chuj: "yuj wal dios" },
+                        { english: "yes", chuj: "weno" },
+                        { english: "no", chuj: "maay" },
+                        { english: "sorry", chuj: "ak' in mimank'olal" },
+                        { english: "excuse me", chuj: "ak' in mimank'olal" },
+                        { english: "good morning", chuj: "wach k'inal" },
+                        { english: "good evening", chuj: "wach yelik'inal" },
+                        { english: "good night", chuj: "k'ik' k'inal" },
+                        { english: "how are you", chuj: "wan ha waelal" },
+                        { english: "I am fine", chuj: "wach ayin" },
+                        { english: "what", chuj: "tas" },
+                        { english: "who", chuj: "mach" },
+                        { english: "when", chuj: "b'ak'inh" },
+                        { english: "where", chuj: "b'ajtil" },
+                        { english: "why", chuj: "tas yuj" },
+                        { english: "how", chuj: "tas tz'aji" },
+                        { english: "and", chuj: "yetoḵ" }
+                    ]
+                },
+                "food": {
+                    name: "Food & Drinks",
+                    vocabulary: [
+                        { english: "apple", chuj: "mansan" },
+                        { english: "banana", chuj: "lo'ol" },
+                        { english: "bread", chuj: "pan" },
+                        { english: "cheese", chuj: "keso" },
+                        { english: "chicken", chuj: "kaxlan" },
+                        { english: "coffee", chuj: "kajpe" },
+                        { english: "egg", chuj: "nholob'" },
+                        { english: "fish", chuj: "chay" },
+                        { english: "juice", chuj: "yal te'" },
+                        { english: "meat", chuj: "chib'ej" },
+                        { english: "milk", chuj: "lech" },
+                        { english: "orange", chuj: "naranja" },
+                        { english: "pasta", chuj: "pasta" },
+                        { english: "potato", chuj: "is" },
+                        { english: "rice", chuj: "ixim" },
+                        { english: "salad", chuj: "itaj" },
+                        { english: "soup", chuj: "kalto" },
+                        { english: "tea", chuj: "k'aj" },
+                        { english: "water", chuj: "a'" },
+                        { english: "wine", chuj: "vino" }
+                    ]
+                },
+                "colors": {
+                    name: "Colors",
+                    vocabulary: [
+                        { english: "black", chuj: "k'ik'" },
+                        { english: "blue", chuj: "yaxk'inal" },
+                        { english: "brown", chuj: "k'anal" },
+                        { english: "gray", chuj: "taan" },
+                        { english: "green", chuj: "yax" },
+                        { english: "orange", chuj: "naranja" },
+                        { english: "pink", chuj: "rosa" },
+                        { english: "purple", chuj: "purpura" },
+                        { english: "red", chuj: "chak" },
+                        { english: "white", chuj: "sak" },
+                        { english: "yellow", chuj: "k'an" },
+                        { english: "dark blue", chuj: "k'ik' yaxk'inal" },
+                        { english: "light blue", chuj: "sak yaxk'inal" },
+                        { english: "dark green", chuj: "k'ik' yax" },
+                        { english: "light green", chuj: "sak yax" }
+                    ]
+                },
+                "body": {
+                    name: "Body Parts",
+                    vocabulary: [
+                        { english: "arm", chuj: "k'ab'" },
+                        { english: "back", chuj: "patkix" },
+                        { english: "ear", chuj: "chikin" },
+                        { english: "eye", chuj: "sat" },
+                        { english: "face", chuj: "sat" },
+                        { english: "finger", chuj: "yiximal k'ab'" },
+                        { english: "foot", chuj: "ok" },
+                        { english: "hair", chuj: "xil" },
+                        { english: "hand", chuj: "k'ab'" },
+                        { english: "head", chuj: "julum" },
+                        { english: "heart", chuj: "pix'an" },
+                        { english: "leg", chuj: "ok" },
+                        { english: "mouth", chuj: "ti'" },
+                        { english: "neck", chuj: "nuk'" },
+                        { english: "nose", chuj: "nh'u" },
+                        { english: "shoulder", chuj: "nikpak" },
+                        { english: "skin", chuj: "tz'um" },
+                        { english: "stomach", chuj: "k'ool" },
+                        { english: "teeth", chuj: "e" },
+                        { english: "tongue", chuj: "ak'" }
+                    ]
+                },
+                "time": {
+                    name: "Time & Days",
+                    vocabulary: [
+                        { english: "Monday", chuj: "slunes" },
+                        { english: "Tuesday", chuj: "smartes" },
+                        { english: "Wednesday", chuj: "smiyerkoles" },
+                        { english: "Thursday", chuj: "sjueves" },
+                        { english: "Friday", chuj: "sviernes" },
+                        { english: "Saturday", chuj: "ssavado" },
+                        { english: "Sunday", chuj: "slominko" },
+                        { english: "day", chuj: "k'u" },
+                        { english: "week", chuj: "semana" },
+                        { english: "month", chuj: "uj" },
+                        { english: "year", chuj: "ab'il" },
+                        { english: "morning", chuj: "k'ik'nalil" },
+                        { english: "afternoon", chuj: "yelik'inal" },
+                        { english: "evening", chuj: "yelik'inal" },
+                        { english: "night", chuj: "k'ik'alil" },
+                        { english: "time", chuj: "ora" },
+                        { english: "hour", chuj: "ora" },
+                        { english: "minute", chuj: "minuto" },
+                        { english: "second", chuj: "segundo" },
+                        { english: "today", chuj: "ticnaic" }
+                    ]
+                },
+                "nature": {
+                    name: "Nature & Weather",
+                    vocabulary: [
+                        { english: "sun", chuj: "k'u" },
+                        { english: "moon", chuj: "uj" },
+                        { english: "star", chuj: "k'anal" },
+                        { english: "sky", chuj: "satchaanh" },
+                        { english: "cloud", chuj: "asun" },
+                        { english: "rain", chuj: "nhab'" },
+                        { english: "snow", chuj: "chewel" },
+                        { english: "wind", chuj: "ik'" },
+                        { english: "storm", chuj: "chak'ik'" },
+                        { english: "tree", chuj: "te'" },
+                        { english: "flower", chuj: "xumak" },
+                        { english: "grass", chuj: "an" },
+                        { english: "mountain", chuj: "witz" },
+                        { english: "sea", chuj: "a nivan" },
+                        { english: "river", chuj: "niwan a'" },
+                        { english: "lake", chuj: "najab'" },
+                        { english: "forest", chuj: "k'ultak te'" },
+                        { english: "beach", chuj: "ti a'" },
+                        { english: "earth", chuj: "lu'um" },
+                        { english: "fire", chuj: "k'ak'" }
+                    ]
+                }
+            }
+        };
+
+        // Game state variables
+        let currentPairs = [];
+        let totalPairs = 10;
+        let matchedPairs = 0;
+        let selectedCards = [];
+        let totalScore = 0;
+        let attempts = 0;
+        let isProcessing = false;
+        let currentCategory = 'basics';
+
+        // DOM elements
+        const sourceColumn = document.getElementById('source-column');
+        const targetColumn = document.getElementById('target-column');
+        const sourceColumnHeader = document.getElementById('source-column-header');
+        const targetColumnHeader = document.getElementById('target-column-header');
+        const matchedCounter = document.getElementById('matched-counter');
+        const scoreElement = document.getElementById('score');
+        const attemptsElement = document.getElementById('attempts');
+        const progressBar = document.getElementById('progress-bar');
+        const newWordsBtn = document.getElementById('new-words-btn');
+        const resetScoreBtn = document.getElementById('reset-score-btn');
+        const categorySelect = document.getElementById('category-select');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const headerTitle = document.getElementById('header-title');
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Select random pairs from the vocabulary
+        function selectRandomPairs() {
+            // Create a copy of the current vocabulary array
+            const shuffled = [...languageData.categories[currentCategory].vocabulary];
+            // Shuffle the array
+            shuffleArray(shuffled);
+            // Take the first 'totalPairs' elements or as many as available
+            return shuffled.slice(0, Math.min(totalPairs, shuffled.length));
+        }
+        
+        // Generate category select options
+        function populateCategorySelect() {
+            categorySelect.innerHTML = '';
+            
+            // Create an option for each category
+            Object.keys(languageData.categories).forEach(categoryKey => {
+                const option = document.createElement('option');
+                option.value = categoryKey;
+                option.textContent = languageData.categories[categoryKey].name;
+                categorySelect.appendChild(option);
+            });
+        }
+
+        // Create and display the game cards
+        function createGameCards() {
+            // Clear the columns
+            sourceColumn.innerHTML = '';
+            targetColumn.innerHTML = '';
+            
+            // Select random pairs
+            currentPairs = selectRandomPairs();
+            
+            // Create source language cards (left column)
+            const sourceWords = currentPairs.map(pair => pair.english);
+            shuffleArray(sourceWords).forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = word;
+                card.dataset.value = word;
+                card.dataset.language = 'english';
+                card.addEventListener('click', handleCardClick);
+                sourceColumn.appendChild(card);
+            });
+            
+            // Create target language cards (right column)
+            const targetWords = currentPairs.map(pair => pair.chuj);
+            shuffleArray(targetWords).forEach(word => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.textContent = word;
+                card.dataset.value = word;
+                card.dataset.language = 'chuj';
+                card.addEventListener('click', handleCardClick);
+                targetColumn.appendChild(card);
+            });
+        }
+
+        // Handle card click events
+        function handleCardClick(event) {
+            if (isProcessing) return;
+            
+            const card = event.target;
+            
+            // Don't allow clicking already matched cards or the same card twice
+            if (card.classList.contains('match') || selectedCards.includes(card)) {
+                return;
+            }
+            
+            // Mark card as selected
+            card.classList.add('selected');
+            selectedCards.push(card);
+            
+            // If we have selected two cards, check for a match
+            if (selectedCards.length === 2) {
+                isProcessing = true;
+                checkForMatch();
+            }
+        }
+
+        // Check if the selected cards form a matching pair
+        function checkForMatch() {
+            const [card1, card2] = selectedCards;
+            
+            // Cards must be from different languages
+            if (card1.dataset.language === card2.dataset.language) {
+                // Not a valid selection
+                setTimeout(() => {
+                    card1.classList.remove('selected');
+                    card2.classList.remove('selected');
+                    selectedCards = [];
+                    isProcessing = false;
+                }, 1000);
+                return;
+            }
+            
+            // Count this as an attempt
+            attempts++;
+            attemptsElement.textContent = attempts;
+            
+            // Find the corresponding pair
+            const englishWord = card1.dataset.language === 'english' 
+                ? card1.dataset.value 
+                : card2.dataset.value;
+            const chujWord = card1.dataset.language === 'chuj' 
+                ? card1.dataset.value 
+                : card2.dataset.value;
+            
+            // Check if this is a correct match
+            const isMatch = currentPairs.some(pair => 
+                pair.english === englishWord && 
+                pair.chuj === chujWord
+            );
+            
+            if (isMatch) {
+                // Handle successful match
+                setTimeout(() => {
+                    card1.classList.add('match');
+                    card2.classList.add('match');
+                    
+                    setTimeout(() => {
+                        card1.classList.add('fade-out');
+                        card2.classList.add('fade-out');
+                        
+                        matchedPairs++;
+                        totalScore++;
+                        updateStats();
+                        
+                        // Check if all pairs are matched
+                        if (matchedPairs === currentPairs.length) {
+                            setTimeout(loadNewRound, 1000);
+                        }
+                        
+                        selectedCards = [];
+                        isProcessing = false;
+                    }, 500);
+                }, 500);
+            } else {
+                // Handle incorrect match
+                setTimeout(() => {
+                    // Add incorrect class for the flash effect
+                    card1.classList.add('incorrect');
+                    card2.classList.add('incorrect');
+                    
+                    // Remove classes after animation completes
+                    setTimeout(() => {
+                        card1.classList.remove('selected', 'incorrect');
+                        card2.classList.remove('selected', 'incorrect');
+                        selectedCards = [];
+                        isProcessing = false;
+                    }, 500);
+                }, 500);
+            }
+        }
+
+        // Update the statistics display
+        function updateStats() {
+            matchedCounter.textContent = matchedPairs;
+            scoreElement.textContent = totalScore;
+            const progressPercentage = (matchedPairs / currentPairs.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+        }
+
+        // Load a new round with fresh word pairs
+        function loadNewRound() {
+            matchedPairs = 0;
+            selectedCards = [];
+            createGameCards();
+            updateStats();
+        }
+
+        // Initialize the game
+        function initGame() {
+            // Get values from selectors
+            currentCategory = categorySelect.value;
+            totalPairs = parseInt(difficultySelect.value);
+            
+            // Update header title based on category
+            const categoryName = languageData.categories[currentCategory].name;
+            headerTitle.textContent = `English - Chuj ${categoryName} Vocabulary`;
+            
+            createGameCards();
+            updateStats();
+        }
+        
+        // Handle category change
+        function handleCategoryChange() {
+            currentCategory = categorySelect.value;
+            loadNewRound();
+            
+            // Update header
+            const categoryName = languageData.categories[currentCategory].name;
+            headerTitle.textContent = `English - Chuj ${categoryName} Vocabulary`;
+        }
+        
+        // Handle difficulty change
+        function handleDifficultyChange() {
+            totalPairs = parseInt(difficultySelect.value);
+            loadNewRound();
+        }
+        
+        // Reset score
+        function resetScore() {
+            totalScore = 0;
+            attempts = 0;
+            updateStats();
+        }
+
+        // Event listeners
+        newWordsBtn.addEventListener('click', loadNewRound);
+        resetScoreBtn.addEventListener('click', resetScore);
+        categorySelect.addEventListener('change', handleCategoryChange);
+        difficultySelect.addEventListener('change', handleDifficultyChange);
+
+        // Start the game when the page loads
+        window.addEventListener('load', () => {
+            populateCategorySelect();
+            initGame();
+        });
+    </script>
+</body>
+</html>
