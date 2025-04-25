@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ITIL Foundations Exam Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .quiz-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #572a72;
+            text-align: center;
+        }
+        .domain-indicator {
+            color: #8e44ad;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+        .question {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+        .question-text {
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        .options {
+            margin-left: 20px;
+        }
+        .option {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .option:hover {
+            background-color: #f9f9f9;
+        }
+        .option.selected {
+            background-color: #e6f7ff;
+            border-color: #1890ff;
+        }
+        .option.correct {
+            background-color: #f6ffed;
+            border-color: #52c41a;
+        }
+        .option.incorrect {
+            background-color: #fff1f0;
+            border-color: #ff4d4f;
+        }
+        .explanation {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+            display: none;
+        }
+        .results {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 20px 0;
+        }
+        .submit-btn, .restart-btn {
+            background-color: #8e44ad;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            font-size: 16px;
+        }
+        .submit-btn:hover, .restart-btn:hover {
+            background-color: #7d3c98;
+        }
+        .progress-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .progress-bar {
+            background-color: #f0f0f0;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            background-color: #8e44ad;
+            height: 100%;
+            width: 0;
+            transition: width 0.3s;
+        }
+        .progress-text {
+            margin-top: 5px;
+            font-size: 14px;
+        }
+        .domain-summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #fafafa;
+            border-radius: 4px;
+        }
+        .domain-performance {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>ITIL Foundations Exam Quiz</h1>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="progress-text">Question <span id="current-question">1</span> of <span id="total-questions">10</span></div>
+        </div>
+        <div id="quiz"></div>
+        <div class="results" id="results" style="display: none;">
+            <h2>Quiz Results</h2>
+            <p>You scored <span id="score">0</span> out of <span id="total">10</span></p>
+            <div class="domain-summary" id="domain-summary"></div>
+        </div>
+        <button class="submit-btn" id="submit">Submit Answer</button>
+        <button class="restart-btn" id="restart" style="display: none;">Restart Quiz</button>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                question: "What is the primary focus of the capacity and performance management practice?",
+                options: [
+                    "Ensuring the lowest possible cost of IT services",
+                    "Ensuring services achieve agreed and expected performance",
+                    "Calculating the financial value of IT investments",
+                    "Setting strategic direction for the organization"
+                ],
+                correctIndex: 1,
+                explanation: "The primary focus of capacity and performance management is ensuring services achieve agreed and expected performance. This practice works to ensure that services meet current and future performance requirements in a cost-effective way. It considers all resources needed to deliver services and balances cost against capacity needs, while ensuring performance meets business requirements.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "How does ITIL 4 define a 'service'?",
+                options: [
+                    "A means of enabling value co-creation by facilitating outcomes that customers want to achieve",
+                    "Any IT capability made available to users",
+                    "A product designed to meet specific business requirements",
+                    "The technical functionality provided by applications and systems"
+                ],
+                correctIndex: 0,
+                explanation: "ITIL 4 defines a service as a means of enabling value co-creation by facilitating outcomes that customers want to achieve, without the customer having to manage specific costs and risks. This definition emphasizes that services help customers achieve outcomes and create value, rather than just being IT capabilities or products. It also recognizes that value is co-created through collaboration between providers and consumers.",
+                domain: "Key Concepts and Principles"
+            },
+            {
+                question: "Which component of the ITIL Service Value System (SVS) enables the organization to respond to changing demands in a coordinated way?",
+                options: [
+                    "Opportunities",
+                    "Service value chain",
+                    "Continual improvement",
+                    "Governance"
+                ],
+                correctIndex: 1,
+                explanation: "The service value chain enables the organization to respond to changing demands in a coordinated way. This component of the SVS is an operating model that outlines the key activities required to respond to demand and facilitate value creation through the creation and management of products and services. It provides flexibility by allowing activities to be combined in different sequences as needed.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which practice is MOST concerned with ensuring conformance to regulatory requirements?",
+                options: [
+                    "Information security management",
+                    "Risk management",
+                    "Service financial management",
+                    "Service level management"
+                ],
+                correctIndex: 0,
+                explanation: "Information security management is most concerned with ensuring conformance to regulatory requirements. This practice protects the information needed to conduct business activities while maintaining the organization's ability to comply with regulatory obligations. It addresses legal and regulatory requirements for data protection, privacy, and information security, ensuring appropriate controls and compliance measures are in place.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is the BEST description of a workaround in problem management?",
+                options: [
+                    "A permanent solution to a problem",
+                    "A way to reduce the impact of an incident or problem when a full resolution is not yet available",
+                    "A method to bypass change management procedures",
+                    "A technique to avoid documenting known errors"
+                ],
+                correctIndex: 1,
+                explanation: "A workaround is best described as a way to reduce the impact of an incident or problem when a full resolution is not yet available. Workarounds are temporary solutions that allow users to continue working by reducing or eliminating the impact of incidents or problems without actually fixing the underlying root cause. They are documented in the known error database and used to help restore service quickly while permanent solutions are developed.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What does the 'collaborate and promote visibility' guiding principle emphasize?",
+                options: [
+                    "Working in isolation to prevent security breaches",
+                    "Working together and sharing information to achieve objectives",
+                    "Restricting access to information to prevent misuse",
+                    "Reporting only positive outcomes to stakeholders"
+                ],
+                correctIndex: 1,
+                explanation: "The 'collaborate and promote visibility' guiding principle emphasizes working together and sharing information to achieve objectives. This principle recognizes that when people collaborate across boundaries and have visibility into activities, objectives, progress, and challenges, better outcomes are achieved. It encourages transparency, information sharing, and breaking down silos between teams and stakeholders.",
+                domain: "Guiding Principles"
+            },
+            {
+                question: "What is the relationship management practice primarily concerned with?",
+                options: [
+                    "Managing contracts with vendors",
+                    "Managing relationships between components in the IT infrastructure",
+                    "Establishing and nurturing links between the organization and its stakeholders",
+                    "Managing employee interpersonal relationships"
+                ],
+                correctIndex: 2,
+                explanation: "The relationship management practice is primarily concerned with establishing and nurturing links between the organization and its stakeholders. This practice focuses on identifying, analyzing, monitoring, and continuously improving relationships with all stakeholders to foster mutual understanding of needs, motivations, and objectives. It aims to build and maintain productive relationships based on mutual trust and understanding.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "What is a key characteristic of a 'standard change' in ITIL 4?",
+                options: [
+                    "It requires approval from senior management",
+                    "It is a pre-authorized, low-risk change with an established procedure",
+                    "It must be implemented immediately to address a critical issue",
+                    "It affects the entire organization's IT infrastructure"
+                ],
+                correctIndex: 1,
+                explanation: "A key characteristic of a 'standard change' is that it is a pre-authorized, low-risk change with an established procedure. Standard changes are changes that have been performed before, have proven to be low risk, and follow a documented and validated procedure. Because they are pre-authorized, they can be implemented without requiring additional assessment or approval each time, improving efficiency.",
+                domain: "Service Management Practices"
+            },
+            {
+                question: "Which value chain activity is primarily concerned with creating new services or improving existing ones?",
+                options: [
+                    "Plan",
+                    "Improve",
+                    "Design and transition",
+                    "Engage"
+                ],
+                correctIndex: 2,
+                explanation: "The 'Design and transition' value chain activity is primarily concerned with creating new services or improving existing ones. This activity ensures that products and services continually meet stakeholder expectations for quality, costs, and time-to-market. It includes developing and refining services, products, and components to meet business requirements and transition them into operational use.",
+                domain: "Service Value System"
+            },
+            {
+                question: "Which of the following is MOST important when measuring service performance?",
+                options: [
+                    "Using as many metrics as possible to capture all aspects of performance",
+                    "Using metrics that align with business outcomes and user experience",
+                    "Focusing exclusively on technical metrics like uptime and response time",
+                    "Measuring only those aspects that are easy to quantify"
+                ],
+                correctIndex: 1,
+                explanation: "When measuring service performance, the most important approach is using metrics that align with business outcomes and user experience. Effective service measurement focuses on what matters to stakeholders, particularly how services contribute to business outcomes and user satisfaction. While technical metrics are important, they should be related to business impact. The measurement approach should be balanced, focusing on quality over quantity of metrics.",
+                domain: "Service Management Practices"
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let answered = false;
+        let domainScores = {};
+        const quiz = document.getElementById('quiz');
+        const submitBtn = document.getElementById('submit');
+        const restartBtn = document.getElementById('restart');
+        const resultsElement = document.getElementById('results');
+        const scoreElement = document.getElementById('score');
+        const progressElement = document.getElementById('progress');
+        const currentQuestionElement = document.getElementById('current-question');
+        const domainSummaryElement = document.getElementById('domain-summary');
+        
+        // Initialize domain scores
+        function initDomainScores() {
+            domainScores = {};
+            quizData.forEach(question => {
+                if (!domainScores[question.domain]) {
+                    domainScores[question.domain] = {
+                        correct: 0,
+                        total: 0
+                    };
+                }
+            });
+        }
+        
+        function loadQuestion() {
+            answered = false;
+            const questionData = quizData[currentQuestion];
+            
+            const questionElement = document.createElement('div');
+            questionElement.className = 'question';
+            questionElement.id = `question-${currentQuestion}`;
+            
+            const domainIndicator = document.createElement('div');
+            domainIndicator.className = 'domain-indicator';
+            domainIndicator.textContent = `Domain: ${questionData.domain}`;
+            
+            const questionText = document.createElement('div');
+            questionText.className = 'question-text';
+            questionText.textContent = `${currentQuestion + 1}. ${questionData.question}`;
+            
+            const options = document.createElement('div');
+            options.className = 'options';
+            
+            questionData.options.forEach((option, index) => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'option';
+                optionElement.textContent = option;
+                optionElement.setAttribute('data-index', index);
+                optionElement.addEventListener('click', selectOption);
+                options.appendChild(optionElement);
+            });
+            
+            const explanation = document.createElement('div');
+            explanation.className = 'explanation';
+            explanation.textContent = questionData.explanation;
+            
+            questionElement.appendChild(domainIndicator);
+            questionElement.appendChild(questionText);
+            questionElement.appendChild(options);
+            questionElement.appendChild(explanation);
+            
+            quiz.innerHTML = '';
+            quiz.appendChild(questionElement);
+            
+            updateProgress();
+        }
+        
+        function selectOption(e) {
+            if (answered) return;
+            
+            const selectedOption = e.target;
+            const optionsContainer = document.querySelector('.options');
+            const options = optionsContainer.querySelectorAll('.option');
+            
+            options.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            selectedOption.classList.add('selected');
+        }
+        
+        function checkAnswer() {
+            if (answered) return;
+            
+            const selectedOption = document.querySelector('.option.selected');
+            if (!selectedOption) {
+                alert('Please select an answer');
+                return;
+            }
+            
+            answered = true;
+            
+            const selectedIndex = parseInt(selectedOption.getAttribute('data-index'));
+            const correctIndex = quizData[currentQuestion].correctIndex;
+            const currentDomain = quizData[currentQuestion].domain;
+            
+            // Update domain scores
+            domainScores[currentDomain].total++;
+            
+            const options = document.querySelectorAll('.option');
+            options.forEach((option, index) => {
+                if (index === correctIndex) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && selectedIndex !== correctIndex) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            if (selectedIndex === correctIndex) {
+                score++;
+                domainScores[currentDomain].correct++;
+            }
+            
+            document.querySelector('.explanation').style.display = 'block';
+            
+            if (currentQuestion < quizData.length - 1) {
+                submitBtn.textContent = 'Next Question';
+            } else {
+                submitBtn.textContent = 'See Results';
+            }
+        }
+        
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+                submitBtn.textContent = 'Submit Answer';
+            } else {
+                showResults();
+            }
+        }
+        
+        function showResults() {
+            quiz.style.display = 'none';
+            resultsElement.style.display = 'block';
+            scoreElement.textContent = score;
+            document.getElementById('total').textContent = quizData.length;
+            submitBtn.style.display = 'none';
+            restartBtn.style.display = 'block';
+            document.querySelector('.progress-container').style.display = 'none';
+            
+            // Generate domain summary
+            domainSummaryElement.innerHTML = '<h3>Performance by Domain</h3>';
+            
+            for (const domain in domainScores) {
+                const domainData = domainScores[domain];
+                const percentage = domainData.total > 0 ? Math.round((domainData.correct / domainData.total) * 100) : 0;
+                
+                const domainElement = document.createElement('div');
+                domainElement.className = 'domain-performance';
+                domainElement.innerHTML = `<strong>${domain}:</strong> ${domainData.correct}/${domainData.total} (${percentage}%)`;
+                
+                domainSummaryElement.appendChild(domainElement);
+            }
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            answered = false;
+            initDomainScores();
+            quiz.style.display = 'block';
+            resultsElement.style.display = 'none';
+            submitBtn.style.display = 'block';
+            restartBtn.style.display = 'none';
+            submitBtn.textContent = 'Submit Answer';
+            document.querySelector('.progress-container').style.display = 'block';
+            loadQuestion();
+        }
+        
+        function updateProgress() {
+            const progressPercentage = ((currentQuestion + 1) / quizData.length) * 100;
+            progressElement.style.width = `${progressPercentage}%`;
+            currentQuestionElement.textContent = currentQuestion + 1;
+        }
+        
+        submitBtn.addEventListener('click', () => {
+            if (!answered) {
+                checkAnswer();
+            } else {
+                nextQuestion();
+            }
+        });
+        
+        restartBtn.addEventListener('click', restartQuiz);
+        
+        // Initialize the quiz
+        initDomainScores();
+        loadQuestion();
+    </script>
+</body>
+</html>
