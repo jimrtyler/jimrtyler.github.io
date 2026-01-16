@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>You Shall Not Pass - Live Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 30px;
+            background: #1a1a2e;
+            color: #eee;
+        }
+        h1 { color: #e94560; text-align: center; }
+        .subtitle { color: #aaa; text-align: center; margin-top: -10px; }
+        .demo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .demo-card {
+            background: #16213e;
+            border: 2px solid #e94560;
+            border-radius: 10px;
+            padding: 25px;
+        }
+        .demo-card.full-width {
+            grid-column: 1 / -1;
+        }
+        .demo-card h2 {
+            color: #e94560;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .demo-card p {
+            color: #aaa;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        button {
+            background: #e94560;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #ff6b6b; }
+        .status {
+            background: #0f3460;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        .expected {
+            background: #1dd1a1;
+            color: #000;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        #iframe-container {
+            max-height: 100px;
+            overflow: hidden;
+        }
+        .header-info {
+            background: #0f3460;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>🛡️ You Shall Not Pass</h1>
+    <p class="subtitle">Live Attack Demonstration</p>
+    
+    <div class="header-info">
+        Open <strong>chrome://extensions</strong> → find extension → click <strong>"service worker"</strong> → <strong>Console tab</strong> to watch violations log in real-time
+    </div>
+    
+    <div class="demo-grid">
+        
+        <div class="demo-card">
+            <h2>🌊 History Flood (Point-Blank)</h2>
+            <p>Calls history.pushState() 200 times to crash filter extensions.</p>
+            <button onclick="floodHistory()">Launch Attack</button>
+            <div class="status" id="history-status">Ready</div>
+            <div class="expected">✓ Blocked at 50 calls/sec, page replaced</div>
+        </div>
+        
+        <div class="demo-card">
+            <h2>📑 Tab Spam</h2>
+            <p>Opens many tabs rapidly to overwhelm monitoring.</p>
+            <button onclick="spamTabs(25)">Open 25 Tabs</button>
+            <div class="status" id="tab-status">Ready</div>
+            <div class="expected">✓ Capped at 15 tabs, excess closed</div>
+        </div>
+        
+        <div class="demo-card">
+            <h2>🖼️ Iframe Flood</h2>
+            <p>Creates 50 hidden iframes for content hiding.</p>
+            <button onclick="floodIframes()">Launch Attack</button>
+            <div class="status" id="iframe-status">Ready</div>
+            <div class="expected">✓ Blocked at 10 iframes/sec</div>
+            <div id="iframe-container"></div>
+        </div>
+        
+        <div class="demo-card">
+            <h2>📭 About:Blank</h2>
+            <p>Opens blank tabs students use to hide content.</p>
+            <button onclick="openBlanks()">Open 5 Blank Tabs</button>
+            <div class="status" id="blank-status">Ready</div>
+            <div class="expected">✓ Blank tabs auto-closed</div>
+        </div>
+        
+        <div class="demo-card full-width">
+            <h2>🔗 Blocked Bypass Domains (Try in URL bar)</h2>
+            <p>The extension's declarativeNetRequest rules block these known bypass sites:</p>
+            <p style="font-family: monospace; color: #e94560;">
+                3kh0.net • titaniumnetwork.org • mercuryworkshop.dev • 
+                interstellar.zip • holyunblocker.org
+            </p>
+            <div class="expected">✓ Connection blocked by extension rules</div>
+        </div>
+        
+    </div>
+
+<script>
+function floodHistory() {
+    document.getElementById('history-status').innerText = 'Flooding...';
+    for (let i = 0; i < 200; i++) {
+        history.pushState({}, '', '?flood=' + i);
+    }
+    document.getElementById('history-status').innerText = 'Completed - extension may not be active';
+}
+
+function spamTabs(count) {
+    document.getElementById('tab-status').innerText = 'Opening ' + count + ' tabs...';
+    for (let i = 0; i < count; i++) {
+        window.open('about:blank', '_blank');
+    }
+    document.getElementById('tab-status').innerText = 'Attempted ' + count + ' - check tab count';
+}
+
+function floodIframes() {
+    document.getElementById('iframe-status').innerText = 'Creating iframes...';
+    let container = document.getElementById('iframe-container');
+    for (let i = 0; i < 50; i++) {
+        let iframe = document.createElement('iframe');
+        iframe.src = 'about:blank';
+        iframe.style.width = '30px';
+        iframe.style.height = '30px';
+        container.appendChild(iframe);
+    }
+    document.getElementById('iframe-status').innerText = 'Created 50 - extension may not be active';
+}
+
+function openBlanks() {
+    document.getElementById('blank-status').innerText = 'Opening blank tabs...';
+    for (let i = 0; i < 5; i++) {
+        window.open('about:blank', '_blank');
+    }
+    document.getElementById('blank-status').innerText = 'Opened 5 - check if they auto-closed';
+}
+</script>
+</body>
+</html>
