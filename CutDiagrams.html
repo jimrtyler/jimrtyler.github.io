@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shaker Cabinet Cut Diagrams</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 20px 28px 60px;
+    min-height: 100vh;
+  }
+
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Header */
+  .header { border-bottom: 1px solid #21262d; padding-bottom: 16px; margin-bottom: 20px; }
+  .header h1 { font: 700 22px/1.2 'JetBrains Mono', monospace; color: #f0f6fc; letter-spacing: -0.5px; }
+  .header .specs { font: 12px/1.4 monospace; color: #8b949e; margin-top: 4px; }
+  .header .totals { display: flex; gap: 20px; margin-top: 10px; font: 11px/1 monospace; flex-wrap: wrap; }
+  .header .totals span:nth-child(1) { color: #7ee787; }
+  .header .totals span:nth-child(2) { color: #79c0ff; }
+  .header .totals span:nth-child(3) { color: #d2a8ff; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 2px; margin-bottom: 0; }
+  .tab-btn {
+    background: transparent; border: 1px solid transparent; border-bottom: 1px solid #30363d;
+    border-radius: 6px 6px 0 0; padding: 9px 18px; color: #8b949e;
+    font: 400 11px/1 'JetBrains Mono', monospace; cursor: pointer; transition: all .15s;
+  }
+  .tab-btn:hover { color: #c9d1d9; }
+  .tab-btn.active {
+    background: #161b22; border: 1px solid #30363d; border-bottom-color: #161b22;
+    color: #f0f6fc; font-weight: 600;
+  }
+  .tab-btn .badge {
+    margin-left: 6px; background: #30363d; color: #fff;
+    border-radius: 10px; padding: 1px 7px; font-size: 10px;
+  }
+  .tab-btn.active .badge { background: #388bfd; }
+
+  /* Content panel */
+  .content {
+    background: #161b22; border: 1px solid #21262d; border-top: none;
+    border-radius: 0 8px 8px 8px; padding: 20px;
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Section headers */
+  .section-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px; }
+  .section-title { font: 600 13px/1 'JetBrains Mono', monospace; }
+  .section-sub { font: 10px/1 monospace; color: #6b7280; margin-left: 12px; }
+  .section-right { font: 10px/1 monospace; color: #6b7280; }
+
+  /* Scale bar */
+  .scale-bar {
+    display: flex; align-items: center; gap: 4px; margin-bottom: 12px;
+    font: 9px/1 monospace; color: #6b7280;
+  }
+  .scale-bar .line {
+    flex: 1; height: 1px;
+    background: repeating-linear-gradient(to right, #333 0px, #333 1px, transparent 1px, transparent 10px);
+  }
+
+  /* Linear board row */
+  .board-row { margin-bottom: 8px; }
+  .board-meta { display: flex; align-items: baseline; gap: 8px; margin-bottom: 3px; }
+  .board-meta .rip-num { font: 700 11px/1 'JetBrains Mono', monospace; color: #c8d6c0; min-width: 56px; }
+  .board-meta .eff { font: 10px/1 monospace; }
+  .board-meta .eff.hi { color: #6ee7b7; }
+  .board-meta .eff.mid { color: #fcd34d; }
+  .board-meta .eff.lo { color: #fca5a5; }
+  .board-meta .waste-txt { font: 9px/1 monospace; color: #6b7280; }
+
+  /* SVG tooltips */
+  .piece-rect { cursor: pointer; transition: opacity .12s; }
+  .piece-rect:hover { filter: brightness(1.25); }
+
+  /* Panel sheet header */
+  .sheet-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 6px; }
+  .sheet-head .num { font: 700 13px/1 'JetBrains Mono', monospace; color: #93c5fd; }
+  .sheet-head .eff { font: 11px/1 monospace; }
+  .sheet-head .dim { font: 10px/1 monospace; color: #6b7280; }
+  .sheet-block { margin-bottom: 28px; }
+
+  /* Hover bar */
+  #hover-bar {
+    display: none; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: #1e293b; border: 1px solid #475569; border-radius: 8px;
+    padding: 8px 18px; font: 11px/1.3 'JetBrains Mono', monospace; color: #e2e8f0;
+    z-index: 100; box-shadow: 0 8px 24px rgba(0,0,0,.5); white-space: nowrap;
+  }
+  #hover-bar .hl { font-weight: 700; margin-right: 12px; }
+  #hover-bar span { margin-right: 14px; }
+
+  /* Legend */
+  .legend {
+    margin-top: 16px; padding: 10px 14px; background: #161b22;
+    border: 1px solid #21262d; border-radius: 8px;
+    font: 10px/1.5 monospace; color: #8b949e;
+  }
+  .legend b { color: #c9d1d9; font-weight: 600; }
+
+  @media print {
+    body { background: #fff; color: #000; padding: 10px; }
+    .tabs, .legend, #hover-bar { display: none; }
+    .tab-content { display: block !important; page-break-inside: avoid; margin-bottom: 30px; }
+    .content { background: #fff; border-color: #ccc; }
+    .board-meta .rip-num, .section-title { color: #000; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Shaker Cabinet Cut Diagrams</h1>
+  <div class="specs">¾" Maple Rails &amp; Stiles · ½" MDO Panels · Cope &amp; Stick · ⅜" Tongue/Groove · ⅛" Kerf</div>
+  <div class="totals">
+    <span>14 Maple Boards (¾"×8"×120")</span>
+    <span>3 MDO Sheets (½"×48"×96")</span>
+    <span>47 Doors &amp; Drawer Fronts</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('maple3')">3" Maple Rips<span class="badge">24</span></button>
+  <button class="tab-btn" onclick="showTab('maple2')">2" Maple Rips<span class="badge">4</span></button>
+  <button class="tab-btn" onclick="showTab('panels')">MDO Panels<span class="badge">3</span></button>
+</div>
+
+<div class="content">
+  <div id="tab-maple3" class="tab-content active"></div>
+  <div id="tab-maple2" class="tab-content"></div>
+  <div id="tab-panels" class="tab-content"></div>
+</div>
+
+<div class="legend">
+  <b>Legend:</b> Colors grouped by cabinet number · Hover any piece for details · ⅛" kerf between all cuts · Panels undersized 1/16" total · R/S = Right/Left Stile · T/B R = Top/Bottom Rail · P = Panel
+</div>
+
+<div id="hover-bar"></div>
+
+<script>
+const COLORS = [
+  "#3B82F6","#10B981","#F59E0B","#EF4444","#8B5CF6","#EC4899",
+  "#06B6D4","#84CC16","#F97316","#6366F1","#14B8A6","#E11D48",
+  "#0EA5E9","#A3E635","#FB923C","#A78BFA","#2DD4BF","#F43F5E",
+  "#38BDF8","#BEF264","#FDBA74","#C084FC","#5EEAD4","#FB7185"
+];
+function cabColor(c) {
+  let h = 0;
+  for (let i = 0; i < c.length; i++) h = c.charCodeAt(i) + ((h << 5) - h);
+  return COLORS[Math.abs(h) % COLORS.length];
+}
+
+const STOCK = 120, SVG_W = 840, BAR_H = 44;
+
+// ─── All board data ───
+const boards3 = [{"pieces":[{"label":"9B-LS","length":61.3125,"lengthFrac":"61 5/16","x":0,"cab":"9B","part":"Stile"},{"label":"6-LS","length":35.75,"lengthFrac":"35 3/4","x":61.4375,"cab":"6","part":"Stile"},{"label":"4A-LS","length":20.75,"lengthFrac":"20 3/4","x":97.3125,"cab":"4A","part":"Stile"}],"used":118.0625,"waste":1.6875,"wasteFrac":"1 11/16","eff":98.4},{"pieces":[{"label":"9B-RS","length":61.3125,"lengthFrac":"61 5/16","x":0,"cab":"9B","part":"Stile"},{"label":"6-RS","length":35.75,"lengthFrac":"35 3/4","x":61.4375,"cab":"6","part":"Stile"},{"label":"4A-RS","length":20.75,"lengthFrac":"20 3/4","x":97.3125,"cab":"4A","part":"Stile"}],"used":118.0625,"waste":1.6875,"wasteFrac":"1 11/16","eff":98.4},{"pieces":[{"label":"1A-LS","length":35.75,"lengthFrac":"35 3/4","x":0,"cab":"1A","part":"Stile"},{"label":"1A-RS","length":35.75,"lengthFrac":"35 3/4","x":35.875,"cab":"1A","part":"Stile"},{"label":"1B-LS","length":35.75,"lengthFrac":"35 3/4","x":71.75,"cab":"1B","part":"Stile"},{"label":"17B-LS","length":11.5,"lengthFrac":"11 1/2","x":107.625,"cab":"17B","part":"Stile"}],"used":119.125,"waste":0.5,"wasteFrac":"1/2","eff":99.3},{"pieces":[{"label":"1B-RS","length":35.75,"lengthFrac":"35 3/4","x":0,"cab":"1B","part":"Stile"},{"label":"2A-LS","length":35.75,"lengthFrac":"35 3/4","x":35.875,"cab":"2A","part":"Stile"},{"label":"2A-RS","length":35.75,"lengthFrac":"35 3/4","x":71.75,"cab":"2A","part":"Stile"},{"label":"17B-RS","length":11.5,"lengthFrac":"11 1/2","x":107.625,"cab":"17B","part":"Stile"}],"used":119.125,"waste":0.5,"wasteFrac":"1/2","eff":99.3},{"pieces":[{"label":"2B-LS","length":35.75,"lengthFrac":"35 3/4","x":0,"cab":"2B","part":"Stile"},{"label":"2B-RS","length":35.75,"lengthFrac":"35 3/4","x":35.875,"cab":"2B","part":"Stile"},{"label":"15A-LS","length":29.75,"lengthFrac":"29 3/4","x":71.75,"cab":"15A","part":"Stile"},{"label":"9A-LS","length":17.8125,"lengthFrac":"17 13/16","x":101.625,"cab":"9A","part":"Stile"}],"used":119.4375,"waste":0.1875,"wasteFrac":"3/16","eff":99.5},{"pieces":[{"label":"15A-RS","length":29.75,"lengthFrac":"29 3/4","x":0,"cab":"15A","part":"Stile"},{"label":"15B-LS","length":29.75,"lengthFrac":"29 3/4","x":29.875,"cab":"15B","part":"Stile"},{"label":"15B-RS","length":29.75,"lengthFrac":"29 3/4","x":59.75,"cab":"15B","part":"Stile"},{"label":"7A-LS","length":29.75,"lengthFrac":"29 3/4","x":89.625,"cab":"7A","part":"Stile"}],"used":119.375,"waste":0.25,"wasteFrac":"1/4","eff":99.5},{"pieces":[{"label":"7A-RS","length":29.75,"lengthFrac":"29 3/4","x":0,"cab":"7A","part":"Stile"},{"label":"7B-LS","length":29.75,"lengthFrac":"29 3/4","x":29.875,"cab":"7B","part":"Stile"},{"label":"7B-RS","length":29.75,"lengthFrac":"29 3/4","x":59.75,"cab":"7B","part":"Stile"},{"label":"3A-LS","length":29.75,"lengthFrac":"29 3/4","x":89.625,"cab":"3A","part":"Stile"}],"used":119.375,"waste":0.25,"wasteFrac":"1/4","eff":99.5},{"pieces":[{"label":"3A-RS","length":29.75,"lengthFrac":"29 3/4","x":0,"cab":"3A","part":"Stile"},{"label":"3B-LS","length":29.75,"lengthFrac":"29 3/4","x":29.875,"cab":"3B","part":"Stile"},{"label":"3B-RS","length":29.75,"lengthFrac":"29 3/4","x":59.75,"cab":"3B","part":"Stile"},{"label":"5A-LS","length":29.75,"lengthFrac":"29 3/4","x":89.625,"cab":"5A","part":"Stile"}],"used":119.375,"waste":0.25,"wasteFrac":"1/4","eff":99.5},{"pieces":[{"label":"5A-RS","length":29.75,"lengthFrac":"29 3/4","x":0,"cab":"5A","part":"Stile"},{"label":"5B-LS","length":29.75,"lengthFrac":"29 3/4","x":29.875,"cab":"5B","part":"Stile"},{"label":"5B-RS","length":29.75,"lengthFrac":"29 3/4","x":59.75,"cab":"5B","part":"Stile"},{"label":"17B-TR","length":24.625,"lengthFrac":"24 5/8","x":89.625,"cab":"17B","part":"Rail"},{"label":"15A-TR","length":5.625,"lengthFrac":"5 5/8","x":114.375,"cab":"15A","part":"Rail"}],"used":120,"waste":0,"wasteFrac":"0","eff":100},{"pieces":[{"label":"17B-BR","length":24.625,"lengthFrac":"24 5/8","x":0,"cab":"17B","part":"Rail"},{"label":"17C-TR","length":24.625,"lengthFrac":"24 5/8","x":24.75,"cab":"17C","part":"Rail"},{"label":"17C-BR","length":24.625,"lengthFrac":"24 5/8","x":49.5,"cab":"17C","part":"Rail"},{"label":"18B-TR","length":24.625,"lengthFrac":"24 5/8","x":74.25,"cab":"18B","part":"Rail"},{"label":"4B-LS","length":20.75,"lengthFrac":"20 3/4","x":99,"cab":"4B","part":"Stile"}],"used":119.75,"waste":0,"wasteFrac":"0","eff":99.8},{"pieces":[{"label":"18B-BR","length":24.625,"lengthFrac":"24 5/8","x":0,"cab":"18B","part":"Rail"},{"label":"18C-TR","length":24.625,"lengthFrac":"24 5/8","x":24.75,"cab":"18C","part":"Rail"},{"label":"18C-BR","length":24.625,"lengthFrac":"24 5/8","x":49.5,"cab":"18C","part":"Rail"},{"label":"16B-LS","length":23.3125,"lengthFrac":"23 5/16","x":74.25,"cab":"16B","part":"Stile"},{"label":"4B-RS","length":20.75,"lengthFrac":"20 3/4","x":97.6875,"cab":"4B","part":"Stile"}],"used":118.4375,"waste":1.0625,"wasteFrac":"1 1/16","eff":98.7},{"pieces":[{"label":"16B-RS","length":23.3125,"lengthFrac":"23 5/16","x":0,"cab":"16B","part":"Stile"},{"label":"11C-LS","length":23.3125,"lengthFrac":"23 5/16","x":23.4375,"cab":"11C","part":"Stile"},{"label":"11C-RS","length":23.3125,"lengthFrac":"23 5/16","x":46.875,"cab":"11C","part":"Stile"},{"label":"11D-LS","length":23.3125,"lengthFrac":"23 5/16","x":70.3125,"cab":"11D","part":"Stile"},{"label":"11D-RS","length":23.3125,"lengthFrac":"23 5/16","x":93.75,"cab":"11D","part":"Stile"}],"used":117.0625,"waste":2.4375,"wasteFrac":"2 7/16","eff":97.6},{"pieces":[{"label":"14C-LS","length":23.3125,"lengthFrac":"23 5/16","x":0,"cab":"14C","part":"Stile"},{"label":"14C-RS","length":23.3125,"lengthFrac":"23 5/16","x":23.4375,"cab":"14C","part":"Stile"},{"label":"14D-LS","length":23.3125,"lengthFrac":"23 5/16","x":46.875,"cab":"14D","part":"Stile"},{"label":"14D-RS","length":23.3125,"lengthFrac":"23 5/16","x":70.3125,"cab":"14D","part":"Stile"},{"label":"13C-LS","length":23.3125,"lengthFrac":"23 5/16","x":93.75,"cab":"13C","part":"Stile"}],"used":117.0625,"waste":2.4375,"wasteFrac":"2 7/16","eff":97.6},{"pieces":[{"label":"13C-RS","length":23.3125,"lengthFrac":"23 5/16","x":0,"cab":"13C","part":"Stile"},{"label":"13D-LS","length":23.3125,"lengthFrac":"23 5/16","x":23.4375,"cab":"13D","part":"Stile"},{"label":"13D-RS","length":23.3125,"lengthFrac":"23 5/16","x":46.875,"cab":"13D","part":"Stile"},{"label":"10C-LS","length":23.3125,"lengthFrac":"23 5/16","x":70.3125,"cab":"10C","part":"Stile"},{"label":"10C-RS","length":23.3125,"lengthFrac":"23 5/16","x":93.75,"cab":"10C","part":"Stile"}],"used":117.0625,"waste":2.4375,"wasteFrac":"2 7/16","eff":97.6},{"pieces":[{"label":"10D-LS","length":23.3125,"lengthFrac":"23 5/16","x":0,"cab":"10D","part":"Stile"},{"label":"10D-RS","length":23.3125,"lengthFrac":"23 5/16","x":23.4375,"cab":"10D","part":"Stile"},{"label":"9A-TR","length":18.5938,"lengthFrac":"18 19/32","x":46.875,"cab":"9A","part":"Rail"},{"label":"9A-BR","length":18.5938,"lengthFrac":"18 19/32","x":65.5938,"cab":"9A","part":"Rail"},{"label":"5A-TR","length":18.5938,"lengthFrac":"18 19/32","x":84.3125,"cab":"5A","part":"Rail"},{"label":"10C-TR","length":15.5938,"lengthFrac":"15 19/32","x":103.0312,"cab":"10C","part":"Rail"}],"used":118.625,"waste":0.75,"wasteFrac":"3/4","eff":98.9},{"pieces":[{"label":"5A-BR","length":18.5938,"lengthFrac":"18 19/32","x":0,"cab":"5A","part":"Rail"},{"label":"5B-TR","length":18.5938,"lengthFrac":"18 19/32","x":18.7188,"cab":"5B","part":"Rail"},{"label":"5B-BR","length":18.5938,"lengthFrac":"18 19/32","x":37.4375,"cab":"5B","part":"Rail"},{"label":"9B-TR","length":18.5938,"lengthFrac":"18 19/32","x":56.1562,"cab":"9B","part":"Rail"},{"label":"9B-BR","length":18.5938,"lengthFrac":"18 19/32","x":74.875,"cab":"9B","part":"Rail"},{"label":"9A-RS","length":17.8125,"lengthFrac":"17 13/16","x":93.5938,"cab":"9A","part":"Stile"},{"label":"7A-TR","length":8.0938,"lengthFrac":"8 3/32","x":111.5312,"cab":"7A","part":"Rail"}],"used":119.625,"waste":0,"wasteFrac":"0","eff":99.7},{"pieces":[{"label":"10C-BR","length":15.5938,"lengthFrac":"15 19/32","x":0,"cab":"10C","part":"Rail"},{"label":"10D-TR","length":15.5938,"lengthFrac":"15 19/32","x":15.7188,"cab":"10D","part":"Rail"},{"label":"10D-BR","length":15.5938,"lengthFrac":"15 19/32","x":31.4375,"cab":"10D","part":"Rail"},{"label":"8A-LS","length":14.75,"lengthFrac":"14 3/4","x":47.1562,"cab":"8A","part":"Stile"},{"label":"8A-RS","length":14.75,"lengthFrac":"14 3/4","x":62.0312,"cab":"8A","part":"Stile"},{"label":"8B-LS","length":14.75,"lengthFrac":"14 3/4","x":76.9062,"cab":"8B","part":"Stile"},{"label":"8B-RS","length":14.75,"lengthFrac":"14 3/4","x":91.7812,"cab":"8B","part":"Stile"},{"label":"12D-TR","length":12.5938,"lengthFrac":"12 19/32","x":106.6562,"cab":"12D","part":"Rail"}],"used":119.25,"waste":0,"wasteFrac":"0","eff":99.4},{"pieces":[{"label":"13C-TR","length":14.0938,"lengthFrac":"14 3/32","x":0,"cab":"13C","part":"Rail"},{"label":"13C-BR","length":14.0938,"lengthFrac":"14 3/32","x":14.2188,"cab":"13C","part":"Rail"},{"label":"13D-TR","length":14.0938,"lengthFrac":"14 3/32","x":28.4375,"cab":"13D","part":"Rail"},{"label":"13D-BR","length":14.0938,"lengthFrac":"14 3/32","x":42.6562,"cab":"13D","part":"Rail"},{"label":"3A-TR","length":14.0938,"lengthFrac":"14 3/32","x":56.875,"cab":"3A","part":"Rail"},{"label":"3A-BR","length":14.0938,"lengthFrac":"14 3/32","x":71.0938,"cab":"3A","part":"Rail"},{"label":"3B-TR","length":14.0938,"lengthFrac":"14 3/32","x":85.3125,"cab":"3B","part":"Rail"},{"label":"3B-BR","length":14.0938,"lengthFrac":"14 3/32","x":99.5312,"cab":"3B","part":"Rail"},{"label":"15A-BR","length":5.625,"lengthFrac":"5 5/8","x":113.75,"cab":"15A","part":"Rail"}],"used":119.375,"waste":0,"wasteFrac":"0","eff":99.5},{"pieces":[{"label":"12D-BR","length":12.5938,"lengthFrac":"12 19/32","x":0,"cab":"12D","part":"Rail"},{"label":"8A-TR","length":12.5938,"lengthFrac":"12 19/32","x":12.7188,"cab":"8A","part":"Rail"},{"label":"8A-BR","length":12.5938,"lengthFrac":"12 19/32","x":25.4375,"cab":"8A","part":"Rail"},{"label":"8B-TR","length":12.5938,"lengthFrac":"12 19/32","x":38.1562,"cab":"8B","part":"Rail"},{"label":"8B-BR","length":12.5938,"lengthFrac":"12 19/32","x":50.875,"cab":"8B","part":"Rail"},{"label":"11C-TR","length":12.5938,"lengthFrac":"12 19/32","x":63.5938,"cab":"11C","part":"Rail"},{"label":"11C-BR","length":12.5938,"lengthFrac":"12 19/32","x":76.3125,"cab":"11C","part":"Rail"},{"label":"11D-TR","length":12.5938,"lengthFrac":"12 19/32","x":89.0312,"cab":"11D","part":"Rail"},{"label":"11D-BR","length":12.5938,"lengthFrac":"12 19/32","x":101.75,"cab":"11D","part":"Rail"}],"used":114.3438,"waste":4.6562,"wasteFrac":"4 21/32","eff":95.3},{"pieces":[{"label":"14C-TR","length":12.5938,"lengthFrac":"12 19/32","x":0,"cab":"14C","part":"Rail"},{"label":"14C-BR","length":12.5938,"lengthFrac":"12 19/32","x":12.7188,"cab":"14C","part":"Rail"},{"label":"14D-TR","length":12.5938,"lengthFrac":"12 19/32","x":25.4375,"cab":"14D","part":"Rail"},{"label":"14D-BR","length":12.5938,"lengthFrac":"12 19/32","x":38.1562,"cab":"14D","part":"Rail"},{"label":"17C-LS","length":11.5,"lengthFrac":"11 1/2","x":50.875,"cab":"17C","part":"Stile"},{"label":"17C-RS","length":11.5,"lengthFrac":"11 1/2","x":62.5,"cab":"17C","part":"Stile"},{"label":"18B-LS","length":11.5,"lengthFrac":"11 1/2","x":74.125,"cab":"18B","part":"Stile"},{"label":"18B-RS","length":11.5,"lengthFrac":"11 1/2","x":85.75,"cab":"18B","part":"Stile"},{"label":"18C-LS","length":11.5,"lengthFrac":"11 1/2","x":97.375,"cab":"18C","part":"Stile"},{"label":"12D-LS","length":9.875,"lengthFrac":"9 7/8","x":109,"cab":"12D","part":"Stile"}],"used":118.875,"waste":0,"wasteFrac":"0","eff":99.1},{"pieces":[{"label":"18C-RS","length":11.5,"lengthFrac":"11 1/2","x":0,"cab":"18C","part":"Stile"},{"label":"1A-TR","length":11.0938,"lengthFrac":"11 3/32","x":11.625,"cab":"1A","part":"Rail"},{"label":"1A-BR","length":11.0938,"lengthFrac":"11 3/32","x":22.8438,"cab":"1A","part":"Rail"},{"label":"1B-TR","length":11.0938,"lengthFrac":"11 3/32","x":34.0625,"cab":"1B","part":"Rail"},{"label":"1B-BR","length":11.0938,"lengthFrac":"11 3/32","x":45.2812,"cab":"1B","part":"Rail"},{"label":"2A-TR","length":11.0938,"lengthFrac":"11 3/32","x":56.5,"cab":"2A","part":"Rail"},{"label":"2A-BR","length":11.0938,"lengthFrac":"11 3/32","x":67.7188,"cab":"2A","part":"Rail"},{"label":"2B-TR","length":11.0938,"lengthFrac":"11 3/32","x":78.9375,"cab":"2B","part":"Rail"},{"label":"2B-BR","length":11.0938,"lengthFrac":"11 3/32","x":90.1562,"cab":"2B","part":"Rail"},{"label":"12D-RS","length":9.875,"lengthFrac":"9 7/8","x":101.375,"cab":"12D","part":"Stile"},{"label":"7A-BR","length":8.0938,"lengthFrac":"8 3/32","x":111.375,"cab":"7A","part":"Rail"}],"used":119.4688,"waste":0,"wasteFrac":"0","eff":99.6},{"pieces":[{"label":"4A-TR","length":9.5938,"lengthFrac":"9 19/32","x":0,"cab":"4A","part":"Rail"},{"label":"4A-BR","length":9.5938,"lengthFrac":"9 19/32","x":9.7188,"cab":"4A","part":"Rail"},{"label":"4B-TR","length":9.5938,"lengthFrac":"9 19/32","x":19.4375,"cab":"4B","part":"Rail"},{"label":"4B-BR","length":9.5938,"lengthFrac":"9 19/32","x":29.1562,"cab":"4B","part":"Rail"},{"label":"16B-TR","length":9.5938,"lengthFrac":"9 19/32","x":38.875,"cab":"16B","part":"Rail"},{"label":"16B-BR","length":9.5938,"lengthFrac":"9 19/32","x":48.5938,"cab":"16B","part":"Rail"},{"label":"6-TR","length":9.25,"lengthFrac":"9 1/4","x":58.3125,"cab":"6","part":"Rail"},{"label":"6-BR","length":9.25,"lengthFrac":"9 1/4","x":67.6875,"cab":"6","part":"Rail"},{"label":"7B-TR","length":8.0938,"lengthFrac":"8 3/32","x":77.0625,"cab":"7B","part":"Rail"},{"label":"7B-BR","length":8.0938,"lengthFrac":"8 3/32","x":85.2812,"cab":"7B","part":"Rail"},{"label":"16A-LS","length":6.5,"lengthFrac":"6 1/2","x":93.5,"cab":"16A","part":"Stile"},{"label":"16A-RS","length":6.5,"lengthFrac":"6 1/2","x":100.125,"cab":"16A","part":"Stile"},{"label":"11A-LS","length":6.5,"lengthFrac":"6 1/2","x":106.75,"cab":"11A","part":"Stile"},{"label":"11A-RS","length":6.5,"lengthFrac":"6 1/2","x":113.375,"cab":"11A","part":"Stile"}],"used":119.875,"waste":0,"wasteFrac":"0","eff":99.9},{"pieces":[{"label":"11B-LS","length":6.5,"lengthFrac":"6 1/2","x":0,"cab":"11B","part":"Stile"},{"label":"11B-RS","length":6.5,"lengthFrac":"6 1/2","x":6.625,"cab":"11B","part":"Stile"},{"label":"12A-LS","length":6.5,"lengthFrac":"6 1/2","x":13.25,"cab":"12A","part":"Stile"},{"label":"12A-RS","length":6.5,"lengthFrac":"6 1/2","x":19.875,"cab":"12A","part":"Stile"},{"label":"12B-LS","length":6.5,"lengthFrac":"6 1/2","x":26.5,"cab":"12B","part":"Stile"},{"label":"12B-RS","length":6.5,"lengthFrac":"6 1/2","x":33.125,"cab":"12B","part":"Stile"},{"label":"12C-LS","length":6.5,"lengthFrac":"6 1/2","x":39.75,"cab":"12C","part":"Stile"},{"label":"12C-RS","length":6.5,"lengthFrac":"6 1/2","x":46.375,"cab":"12C","part":"Stile"},{"label":"14A-LS","length":6.5,"lengthFrac":"6 1/2","x":53,"cab":"14A","part":"Stile"},{"label":"14A-RS","length":6.5,"lengthFrac":"6 1/2","x":59.625,"cab":"14A","part":"Stile"},{"label":"14B-LS","length":6.5,"lengthFrac":"6 1/2","x":66.25,"cab":"14B","part":"Stile"},{"label":"14B-RS","length":6.5,"lengthFrac":"6 1/2","x":72.875,"cab":"14B","part":"Stile"},{"label":"13A-LS","length":6.5,"lengthFrac":"6 1/2","x":79.5,"cab":"13A","part":"Stile"},{"label":"13A-RS","length":6.5,"lengthFrac":"6 1/2","x":86.125,"cab":"13A","part":"Stile"},{"label":"13B-LS","length":6.5,"lengthFrac":"6 1/2","x":92.75,"cab":"13B","part":"Stile"},{"label":"13B-RS","length":6.5,"lengthFrac":"6 1/2","x":99.375,"cab":"13B","part":"Stile"},{"label":"10A-LS","length":6.5,"lengthFrac":"6 1/2","x":106,"cab":"10A","part":"Stile"},{"label":"10A-RS","length":6.5,"lengthFrac":"6 1/2","x":112.625,"cab":"10A","part":"Stile"}],"used":119.125,"waste":0,"wasteFrac":"0","eff":99.3},{"pieces":[{"label":"10B-LS","length":6.5,"lengthFrac":"6 1/2","x":0,"cab":"10B","part":"Stile"},{"label":"10B-RS","length":6.5,"lengthFrac":"6 1/2","x":6.625,"cab":"10B","part":"Stile"},{"label":"17A-LS","length":6.5,"lengthFrac":"6 1/2","x":13.25,"cab":"17A","part":"Stile"},{"label":"17A-RS","length":6.5,"lengthFrac":"6 1/2","x":19.875,"cab":"17A","part":"Stile"},{"label":"18A-LS","length":6.5,"lengthFrac":"6 1/2","x":26.5,"cab":"18A","part":"Stile"},{"label":"18A-RS","length":6.5,"lengthFrac":"6 1/2","x":33.125,"cab":"18A","part":"Stile"},{"label":"15B-TR","length":5.625,"lengthFrac":"5 5/8","x":39.75,"cab":"15B","part":"Rail"},{"label":"15B-BR","length":5.625,"lengthFrac":"5 5/8","x":45.5,"cab":"15B","part":"Rail"}],"used":51.125,"waste":68,"wasteFrac":"68","eff":42.6}];
+
+const boards2 = [{"pieces":[{"label":"17A-TR","length":24.625,"lengthFrac":"24 5/8","x":0,"cab":"17A","part":"Rail"},{"label":"17A-BR","length":24.625,"lengthFrac":"24 5/8","x":24.75,"cab":"17A","part":"Rail"},{"label":"18A-TR","length":24.625,"lengthFrac":"24 5/8","x":49.5,"cab":"18A","part":"Rail"},{"label":"18A-BR","length":24.625,"lengthFrac":"24 5/8","x":74.25,"cab":"18A","part":"Rail"},{"label":"10A-TR","length":15.5938,"lengthFrac":"15 19/32","x":99,"cab":"10A","part":"Rail"}],"used":114.5938,"waste":4.9062,"wasteFrac":"4 29/32","eff":95.5},{"pieces":[{"label":"10A-BR","length":15.5938,"lengthFrac":"15 19/32","x":0,"cab":"10A","part":"Rail"},{"label":"10B-TR","length":15.5938,"lengthFrac":"15 19/32","x":15.7188,"cab":"10B","part":"Rail"},{"label":"10B-BR","length":15.5938,"lengthFrac":"15 19/32","x":31.4375,"cab":"10B","part":"Rail"},{"label":"13A-TR","length":14.0938,"lengthFrac":"14 3/32","x":47.1562,"cab":"13A","part":"Rail"},{"label":"13A-BR","length":14.0938,"lengthFrac":"14 3/32","x":61.375,"cab":"13A","part":"Rail"},{"label":"13B-TR","length":14.0938,"lengthFrac":"14 3/32","x":75.5938,"cab":"13B","part":"Rail"},{"label":"13B-BR","length":14.0938,"lengthFrac":"14 3/32","x":89.8125,"cab":"13B","part":"Rail"},{"label":"11A-TR","length":12.5938,"lengthFrac":"12 19/32","x":104.0312,"cab":"11A","part":"Rail"}],"used":116.625,"waste":2.5,"wasteFrac":"2 1/2","eff":97.2},{"pieces":[{"label":"11A-BR","length":12.5938,"lengthFrac":"12 19/32","x":0,"cab":"11A","part":"Rail"},{"label":"11B-TR","length":12.5938,"lengthFrac":"12 19/32","x":12.7188,"cab":"11B","part":"Rail"},{"label":"11B-BR","length":12.5938,"lengthFrac":"12 19/32","x":25.4375,"cab":"11B","part":"Rail"},{"label":"12A-TR","length":12.5938,"lengthFrac":"12 19/32","x":38.1562,"cab":"12A","part":"Rail"},{"label":"12A-BR","length":12.5938,"lengthFrac":"12 19/32","x":50.875,"cab":"12A","part":"Rail"},{"label":"12B-TR","length":12.5938,"lengthFrac":"12 19/32","x":63.5938,"cab":"12B","part":"Rail"},{"label":"12B-BR","length":12.5938,"lengthFrac":"12 19/32","x":76.3125,"cab":"12B","part":"Rail"},{"label":"12C-TR","length":12.5938,"lengthFrac":"12 19/32","x":89.0312,"cab":"12C","part":"Rail"},{"label":"12C-BR","length":12.5938,"lengthFrac":"12 19/32","x":101.75,"cab":"12C","part":"Rail"}],"used":114.3438,"waste":4.6562,"wasteFrac":"4 21/32","eff":95.3},{"pieces":[{"label":"14A-TR","length":12.5938,"lengthFrac":"12 19/32","x":0,"cab":"14A","part":"Rail"},{"label":"14A-BR","length":12.5938,"lengthFrac":"12 19/32","x":12.7188,"cab":"14A","part":"Rail"},{"label":"14B-TR","length":12.5938,"lengthFrac":"12 19/32","x":25.4375,"cab":"14B","part":"Rail"},{"label":"14B-BR","length":12.5938,"lengthFrac":"12 19/32","x":38.1562,"cab":"14B","part":"Rail"},{"label":"16A-TR","length":9.5938,"lengthFrac":"9 19/32","x":50.875,"cab":"16A","part":"Rail"},{"label":"16A-BR","length":9.5938,"lengthFrac":"9 19/32","x":60.5938,"cab":"16A","part":"Rail"}],"used":70.1875,"waste":49.1875,"wasteFrac":"49 3/16","eff":58.5}];
+
+const panelSheets = [{"shelves":[{"y":0,"height":56,"panels":[{"label":"9B-P","cab":"9B","w":18.5312,"h":56,"wFrac":"18 17/32","hFrac":"56","origW":18.5312,"origH":56,"x":0,"rotated":false},{"label":"6-P","cab":"6","w":9.1875,"h":30.4375,"wFrac":"9 3/16","hFrac":"30 7/16","origW":9.1875,"origH":30.4375,"x":18.6562,"rotated":false},{"label":"1A-P","cab":"1A","w":11.0312,"h":30.4375,"wFrac":"11 1/32","hFrac":"30 7/16","origW":11.0312,"origH":30.4375,"x":27.9688,"rotated":false},{"label":"17A-P","cab":"17A","w":3.1875,"h":24.5625,"wFrac":"3 3/16","hFrac":"24 9/16","origW":24.5625,"origH":3.1875,"x":39.125,"rotated":true},{"label":"18A-P","cab":"18A","w":3.1875,"h":24.5625,"wFrac":"3 3/16","hFrac":"24 9/16","origW":24.5625,"origH":3.1875,"x":42.4375,"rotated":true}]},{"y":56.125,"height":30.4375,"panels":[{"label":"1B-P","cab":"1B","w":11.0312,"h":30.4375,"wFrac":"11 1/32","hFrac":"30 7/16","origW":11.0312,"origH":30.4375,"x":0,"rotated":false},{"label":"2A-P","cab":"2A","w":11.0312,"h":30.4375,"wFrac":"11 1/32","hFrac":"30 7/16","origW":11.0312,"origH":30.4375,"x":11.1562,"rotated":false},{"label":"2B-P","cab":"2B","w":11.0312,"h":30.4375,"wFrac":"11 1/32","hFrac":"30 7/16","origW":11.0312,"origH":30.4375,"x":22.3125,"rotated":false},{"label":"17B-P","cab":"17B","w":6.1875,"h":24.5625,"wFrac":"6 3/16","hFrac":"24 9/16","origW":24.5625,"origH":6.1875,"x":33.4688,"rotated":true},{"label":"17C-P","cab":"17C","w":6.1875,"h":24.5625,"wFrac":"6 3/16","hFrac":"24 9/16","origW":24.5625,"origH":6.1875,"x":39.7812,"rotated":true}]},{"y":86.6875,"height":6.1875,"panels":[{"label":"18B-P","cab":"18B","w":24.5625,"h":6.1875,"wFrac":"24 9/16","hFrac":"6 3/16","origW":24.5625,"origH":6.1875,"x":0,"rotated":false},{"label":"10A-P","cab":"10A","w":15.5312,"h":3.1875,"wFrac":"15 17/32","hFrac":"3 3/16","origW":15.5312,"origH":3.1875,"x":24.6875,"rotated":false}]}],"eff":72.1},{"shelves":[{"y":0,"height":6.1875,"panels":[{"label":"18C-P","cab":"18C","w":24.5625,"h":6.1875,"wFrac":"24 9/16","hFrac":"6 3/16","origW":24.5625,"origH":6.1875,"x":0,"rotated":false},{"label":"10B-P","cab":"10B","w":15.5312,"h":3.1875,"wFrac":"15 17/32","hFrac":"3 3/16","origW":15.5312,"origH":3.1875,"x":24.6875,"rotated":false}]},{"y":6.3125,"height":24.4375,"panels":[{"label":"15A-P","cab":"15A","w":5.5625,"h":24.4375,"wFrac":"5 9/16","hFrac":"24 7/16","origW":5.5625,"origH":24.4375,"x":0,"rotated":false},{"label":"15B-P","cab":"15B","w":5.5625,"h":24.4375,"wFrac":"5 9/16","hFrac":"24 7/16","origW":5.5625,"origH":24.4375,"x":5.6875,"rotated":false},{"label":"7A-P","cab":"7A","w":8.0312,"h":24.4375,"wFrac":"8 1/32","hFrac":"24 7/16","origW":8.0312,"origH":24.4375,"x":11.375,"rotated":false},{"label":"7B-P","cab":"7B","w":8.0312,"h":24.4375,"wFrac":"8 1/32","hFrac":"24 7/16","origW":8.0312,"origH":24.4375,"x":19.5312,"rotated":false},{"label":"3A-P","cab":"3A","w":14.0312,"h":24.4375,"wFrac":"14 1/32","hFrac":"24 7/16","origW":14.0312,"origH":24.4375,"x":27.6875,"rotated":false},{"label":"13A-P","cab":"13A","w":3.1875,"h":14.0312,"wFrac":"3 3/16","hFrac":"14 1/32","origW":14.0312,"origH":3.1875,"x":41.8438,"rotated":true}]},{"y":30.875,"height":24.4375,"panels":[{"label":"3B-P","cab":"3B","w":14.0312,"h":24.4375,"wFrac":"14 1/32","hFrac":"24 7/16","origW":14.0312,"origH":24.4375,"x":0,"rotated":false},{"label":"5A-P","cab":"5A","w":18.5312,"h":24.4375,"wFrac":"18 17/32","hFrac":"24 7/16","origW":18.5312,"origH":24.4375,"x":14.1562,"rotated":false},{"label":"9A-P","cab":"9A","w":12.5,"h":18.5312,"wFrac":"12 1/2","hFrac":"18 17/32","origW":18.5312,"origH":12.5,"x":32.8125,"rotated":true}]},{"y":55.4375,"height":24.4375,"panels":[{"label":"5B-P","cab":"5B","w":18.5312,"h":24.4375,"wFrac":"18 17/32","hFrac":"24 7/16","origW":18.5312,"origH":24.4375,"x":0,"rotated":false},{"label":"16B-P","cab":"16B","w":9.5312,"h":18,"wFrac":"9 17/32","hFrac":"18","origW":9.5312,"origH":18,"x":18.6562,"rotated":false},{"label":"11C-P","cab":"11C","w":12.5312,"h":18,"wFrac":"12 17/32","hFrac":"18","origW":12.5312,"origH":18,"x":28.3125,"rotated":false},{"label":"13B-P","cab":"13B","w":3.1875,"h":14.0312,"wFrac":"3 3/16","hFrac":"14 1/32","origW":14.0312,"origH":3.1875,"x":40.9688,"rotated":true},{"label":"11A-P","cab":"11A","w":3.1875,"h":12.5312,"wFrac":"3 3/16","hFrac":"12 17/32","origW":12.5312,"origH":3.1875,"x":44.2812,"rotated":true}]},{"y":80,"height":12.5312,"panels":[{"label":"11D-P","cab":"11D","w":18,"h":12.5312,"wFrac":"18","hFrac":"12 17/32","origW":12.5312,"origH":18,"x":0,"rotated":true},{"label":"14C-P","cab":"14C","w":18,"h":12.5312,"wFrac":"18","hFrac":"12 17/32","origW":12.5312,"origH":18,"x":18.125,"rotated":true},{"label":"11B-P","cab":"11B","w":3.1875,"h":12.5312,"wFrac":"3 3/16","hFrac":"12 17/32","origW":12.5312,"origH":3.1875,"x":36.25,"rotated":true},{"label":"12A-P","cab":"12A","w":3.1875,"h":12.5312,"wFrac":"3 3/16","hFrac":"12 17/32","origW":12.5312,"origH":3.1875,"x":39.5625,"rotated":true},{"label":"12B-P","cab":"12B","w":3.1875,"h":12.5312,"wFrac":"3 3/16","hFrac":"12 17/32","origW":12.5312,"origH":3.1875,"x":42.875,"rotated":true}]},{"y":92.6562,"height":3.1875,"panels":[{"label":"12C-P","cab":"12C","w":12.5312,"h":3.1875,"wFrac":"12 17/32","hFrac":"3 3/16","origW":12.5312,"origH":3.1875,"x":0,"rotated":false},{"label":"14A-P","cab":"14A","w":12.5312,"h":3.1875,"wFrac":"12 17/32","hFrac":"3 3/16","origW":12.5312,"origH":3.1875,"x":12.6562,"rotated":false},{"label":"14B-P","cab":"14B","w":12.5312,"h":3.1875,"wFrac":"12 17/32","hFrac":"3 3/16","origW":12.5312,"origH":3.1875,"x":25.3125,"rotated":false},{"label":"16A-P","cab":"16A","w":9.5312,"h":3.1875,"wFrac":"9 17/32","hFrac":"3 3/16","origW":9.5312,"origH":3.1875,"x":37.9688,"rotated":false}]}],"eff":85.4},{"shelves":[{"y":0,"height":18,"panels":[{"label":"14D-P","cab":"14D","w":12.5312,"h":18,"wFrac":"12 17/32","hFrac":"18","origW":12.5312,"origH":18,"x":0,"rotated":false},{"label":"13C-P","cab":"13C","w":14.0312,"h":18,"wFrac":"14 1/32","hFrac":"18","origW":14.0312,"origH":18,"x":12.6562,"rotated":false},{"label":"13D-P","cab":"13D","w":14.0312,"h":18,"wFrac":"14 1/32","hFrac":"18","origW":14.0312,"origH":18,"x":26.8125,"rotated":false},{"label":"12D-P","cab":"12D","w":4.5625,"h":12.5312,"wFrac":"4 9/16","hFrac":"12 17/32","origW":12.5312,"origH":4.5625,"x":40.9688,"rotated":true}]},{"y":18.125,"height":18,"panels":[{"label":"10C-P","cab":"10C","w":15.5312,"h":18,"wFrac":"15 17/32","hFrac":"18","origW":15.5312,"origH":18,"x":0,"rotated":false},{"label":"10D-P","cab":"10D","w":15.5312,"h":18,"wFrac":"15 17/32","hFrac":"18","origW":15.5312,"origH":18,"x":15.6562,"rotated":false},{"label":"4A-P","cab":"4A","w":9.5312,"h":15.4375,"wFrac":"9 17/32","hFrac":"15 7/16","origW":9.5312,"origH":15.4375,"x":31.3125,"rotated":false}]},{"y":36.25,"height":15.4375,"panels":[{"label":"4B-P","cab":"4B","w":9.5312,"h":15.4375,"wFrac":"9 17/32","hFrac":"15 7/16","origW":9.5312,"origH":15.4375,"x":0,"rotated":false},{"label":"8A-P","cab":"8A","w":12.5312,"h":9.4375,"wFrac":"12 17/32","hFrac":"9 7/16","origW":12.5312,"origH":9.4375,"x":9.6562,"rotated":false},{"label":"8B-P","cab":"8B","w":12.5312,"h":9.4375,"wFrac":"12 17/32","hFrac":"9 7/16","origW":12.5312,"origH":9.4375,"x":22.3125,"rotated":false}]}],"eff":40.8}];
+
+// ─── Rendering ───
+const scale = SVG_W / STOCK;
+const hoverBar = document.getElementById('hover-bar');
+
+function showTab(id) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.target.closest('.tab-btn').classList.add('active');
+}
+
+function showHover(p) {
+  let html = `<span class="hl" style="color:${cabColor(p.cab)}">${p.label}</span>`;
+  html += `<span>Cabinet: ${p.cab}</span>`;
+  if (p.origW !== undefined) {
+    html += `<span>Panel: ${p.wFrac}" × ${p.hFrac}"</span>`;
+    if (p.rotated) html += `<span style="color:#fbbf24">↻ Rotated</span>`;
+  } else {
+    html += `<span>${p.part}: ${p.lengthFrac}"</span>`;
+  }
+  hoverBar.innerHTML = html;
+  hoverBar.style.display = 'flex';
+}
+function hideHover() { hoverBar.style.display = 'none'; }
+
+function renderLinearBoards(boards, container, title, subtitle, boardsNeeded) {
+  const avg = (boards.reduce((s,b) => s + b.eff, 0) / boards.length).toFixed(1);
+  let html = `<div class="section-head">
+    <div><span class="section-title" style="color:#c8d6c0">${title}</span>
+    <span class="section-sub">120" stock → avg ${avg}% utilization</span></div>
+    <div class="section-right">${boardsNeeded}</div></div>`;
+  html += `<div class="scale-bar"><span>0"</span><div class="line"></div><span>120"</span></div>`;
+
+  boards.forEach((b, bi) => {
+    const effClass = b.eff >= 95 ? 'hi' : b.eff >= 80 ? 'mid' : 'lo';
+    html += `<div class="board-row">
+      <div class="board-meta">
+        <span class="rip-num">Rip #${bi+1}</span>
+        <span class="eff ${effClass}">${b.eff.toFixed(1)}%</span>
+        <span class="waste-txt">waste: ${b.wasteFrac}"</span>
+      </div>
+      <svg width="${SVG_W}" height="${BAR_H}" style="display:block;border-radius:3px">
+        <rect x="0" y="0" width="${SVG_W}" height="${BAR_H}" rx="2" fill="#1a1a2e" stroke="#333" stroke-width=".5"/>`;
+
+    b.pieces.forEach((p, pi) => {
+      const x = p.x * scale;
+      const w = p.length * scale;
+      const col = cabColor(p.cab);
+      html += `<g class="piece-rect" onmouseenter='showHover(${JSON.stringify(p).replace(/'/g,"&#39;")})' onmouseleave='hideHover()'>
+        <rect x="${x+.5}" y="1" width="${Math.max(w-1,2)}" height="${BAR_H-2}" rx="1"
+          fill="${col}" fill-opacity=".75" stroke="rgba(0,0,0,.3)" stroke-width=".5"/>`;
+      if (w > 30) html += `<text x="${x+w/2}" y="${BAR_H/2-5}" text-anchor="middle" fill="#fff"
+        font-size="${w>55?9:7.5}" font-family="'JetBrains Mono',monospace" font-weight="600">${p.label}</text>`;
+      if (w > 44) html += `<text x="${x+w/2}" y="${BAR_H/2+7}" text-anchor="middle" fill="rgba(255,255,255,.65)"
+        font-size="7" font-family="monospace">${p.lengthFrac}"</text>`;
+      html += `</g>`;
+    });
+    html += `</svg></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function renderPanels(sheets, container) {
+  const SCALE = 6.5, SHEET_W = 48, SHEET_H = 96;
+  const svgW = SHEET_W * SCALE, svgH = SHEET_H * SCALE;
+  let html = `<div class="section-head"><div>
+    <span class="section-title" style="color:#93c5fd">MDO Panel Layouts</span>
+    <span class="section-sub">48" × 96" sheets · ↻ = rotated panel</span></div></div>`;
+
+  sheets.forEach((s, si) => {
+    const effClass = s.eff >= 70 ? 'hi' : s.eff >= 50 ? 'mid' : 'lo';
+    html += `<div class="sheet-block">
+      <div class="sheet-head">
+        <span class="num">Sheet #${si+1}</span>
+        <span class="eff ${effClass}">${s.eff}% utilized</span>
+        <span class="dim">48" × 96" MDO</span>
+      </div>
+      <svg width="${svgW+40}" height="${svgH+20}" style="display:block">
+        <rect x="30" y="0" width="${svgW}" height="${svgH}" fill="#0f172a" stroke="#475569" stroke-width="1" rx="2"/>`;
+
+    // Grid lines + labels
+    [0,12,24,36,48,60,72,84,96].forEach(v => {
+      html += `<text x="26" y="${v*SCALE+4}" text-anchor="end" fill="#6b7280" font-size="8" font-family="monospace">${v}"</text>`;
+      html += `<line x1="28" y1="${v*SCALE}" x2="${30+svgW}" y2="${v*SCALE}" stroke="#1e293b" stroke-width=".5"/>`;
+    });
+    [0,12,24,36,48].forEach(v => {
+      html += `<text x="${30+v*SCALE}" y="${svgH+14}" text-anchor="middle" fill="#6b7280" font-size="8" font-family="monospace">${v}"</text>`;
+      html += `<line x1="${30+v*SCALE}" y1="0" x2="${30+v*SCALE}" y2="${svgH}" stroke="#1e293b" stroke-width=".5"/>`;
+    });
+
+    s.shelves.forEach(shelf => {
+      shelf.panels.forEach(p => {
+        const px = 30 + p.x * SCALE;
+        const py = shelf.y * SCALE;
+        const pw = p.w * SCALE;
+        const ph = p.h * SCALE;
+        const col = cabColor(p.cab);
+        const d = JSON.stringify(p).replace(/'/g,"&#39;");
+        html += `<g class="piece-rect" onmouseenter='showHover(${d})' onmouseleave='hideHover()'>
+          <rect x="${px+.5}" y="${py+.5}" width="${Math.max(pw-1,2)}" height="${Math.max(ph-1,2)}" rx="1"
+            fill="${col}" fill-opacity=".7" stroke="rgba(0,0,0,.4)" stroke-width=".5"/>`;
+        const fs = Math.min(pw/6, ph/3, 11);
+        if (pw > 30 && ph > 14) html += `<text x="${px+pw/2}" y="${py+ph/2-(ph>35?4:0)}" text-anchor="middle"
+          dominant-baseline="central" fill="#fff" font-size="${fs}" font-family="'JetBrains Mono',monospace" font-weight="600">${p.label}</text>`;
+        if (pw > 55 && ph > 30) html += `<text x="${px+pw/2}" y="${py+ph/2+10}" text-anchor="middle"
+          fill="rgba(255,255,255,.55)" font-size="7.5" font-family="monospace">${p.wFrac}" × ${p.hFrac}"</text>`;
+        if (p.rotated && pw > 20 && ph > 20) html += `<text x="${px+4}" y="${py+10}" fill="rgba(255,255,255,.5)" font-size="7" font-family="monospace">↻</text>`;
+        html += `</g>`;
+      });
+    });
+    html += `</svg></div>`;
+  });
+  container.innerHTML = html;
+}
+
+// Initial render
+renderLinearBoards(boards3, document.getElementById('tab-maple3'),
+  '3" Wide Rips — Stiles & Door Rails', '120" stock', `2 rips per 8" board = ${Math.ceil(boards3.length/2)} boards`);
+renderLinearBoards(boards2, document.getElementById('tab-maple2'),
+  '2" Wide Rips — Drawer Rails', '120" stock', `3 rips per 8" board = ${Math.ceil(boards2.length/3)} boards`);
+renderPanels(panelSheets, document.getElementById('tab-panels'));
+
+// Tab click delegation
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const id = this.textContent.includes('3"') ? 'maple3' : this.textContent.includes('2"') ? 'maple2' : 'panels';
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    this.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
