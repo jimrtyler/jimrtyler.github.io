@@ -109,6 +109,39 @@
   }
   .legend b { color: #c9d1d9; font-weight: 600; }
 
+  /* Summary tables */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+  .summary-panel-grid { margin-bottom: 24px; }
+  .sum-table { width: 100%; border-collapse: collapse; }
+  .sum-table caption {
+    text-align: left; font: 600 13px/1 'JetBrains Mono', monospace;
+    padding: 0 0 10px; color: #c8d6c0;
+  }
+  .sum-table caption.panel-cap { color: #93c5fd; }
+  .sum-table thead th {
+    font: 600 10px/1 'JetBrains Mono', monospace; color: #f0f6fc;
+    background: #21262d; padding: 7px 10px; text-align: center;
+    border-bottom: 1px solid #30363d;
+  }
+  .sum-table thead th:first-child { text-align: left; border-radius: 4px 0 0 0; }
+  .sum-table thead th:last-child { border-radius: 0 4px 0 0; }
+  .sum-table tbody td {
+    font: 11px/1 'JetBrains Mono', monospace; color: #c9d1d9;
+    padding: 6px 10px; text-align: center; border-bottom: 1px solid #161b22;
+  }
+  .sum-table tbody td:first-child { text-align: left; }
+  .sum-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  .sum-table tbody tr:hover td { background: rgba(56,139,253,.1); }
+  .qty-cell { font-weight: 700; color: #7ee787; font-size: 13px; }
+  .sum-table tfoot td {
+    font: 700 11px/1 'JetBrains Mono', monospace; color: #f0f6fc;
+    padding: 8px 10px; border-top: 2px solid #30363d; text-align: center;
+    background: #1a1f27;
+  }
+  .sum-table tfoot td:first-child { text-align: left; }
+
+  @media (max-width: 700px) { .summary-grid { grid-template-columns: 1fr; } }
+
   @media print {
     body { background: #fff; color: #000; padding: 10px; }
     .tabs, .legend, #hover-bar { display: none; }
@@ -134,12 +167,14 @@
   <button class="tab-btn active" onclick="showTab('maple3')">3" Maple Rips<span class="badge">24</span></button>
   <button class="tab-btn" onclick="showTab('maple2')">2" Maple Rips<span class="badge">4</span></button>
   <button class="tab-btn" onclick="showTab('panels')">MDO Panels<span class="badge">3</span></button>
+  <button class="tab-btn" onclick="showTab('summary')">Cut Summary<span class="badge">✓</span></button>
 </div>
 
 <div class="content">
   <div id="tab-maple3" class="tab-content active"></div>
   <div id="tab-maple2" class="tab-content"></div>
   <div id="tab-panels" class="tab-content"></div>
+  <div id="tab-summary" class="tab-content"></div>
 </div>
 
 <div class="legend">
@@ -285,17 +320,66 @@ function renderPanels(sheets, container) {
   container.innerHTML = html;
 }
 
+// ─── Grouped quantity data ───
+const stileGroups = [{"w":"3","l":"61 5/16","qty":2},{"w":"3","l":"35 3/4","qty":10},{"w":"3","l":"29 3/4","qty":16},{"w":"3","l":"23 5/16","qty":18},{"w":"3","l":"20 3/4","qty":4},{"w":"3","l":"17 13/16","qty":2},{"w":"3","l":"14 3/4","qty":4},{"w":"3","l":"11 1/2","qty":8},{"w":"3","l":"9 7/8","qty":2},{"w":"3","l":"6 1/2","qty":28}];
+const railGroups = [{"w":"2","l":"24 5/8","qty":4},{"w":"3","l":"24 5/8","qty":8},{"w":"3","l":"18 19/32","qty":8},{"w":"2","l":"15 19/32","qty":4},{"w":"3","l":"15 19/32","qty":4},{"w":"2","l":"14 3/32","qty":4},{"w":"3","l":"14 3/32","qty":8},{"w":"2","l":"12 19/32","qty":14},{"w":"3","l":"12 19/32","qty":14},{"w":"3","l":"11 3/32","qty":8},{"w":"2","l":"9 19/32","qty":2},{"w":"3","l":"9 19/32","qty":6},{"w":"3","l":"9 1/4","qty":2},{"w":"3","l":"8 3/32","qty":4},{"w":"3","l":"5 5/8","qty":4}];
+const panelGroups = [{"w":"18 17/32","h":"56","qty":1},{"w":"11 1/32","h":"30 7/16","qty":4},{"w":"9 3/16","h":"30 7/16","qty":1},{"w":"18 17/32","h":"24 7/16","qty":2},{"w":"14 1/32","h":"24 7/16","qty":2},{"w":"8 1/32","h":"24 7/16","qty":2},{"w":"5 9/16","h":"24 7/16","qty":2},{"w":"15 17/32","h":"18","qty":2},{"w":"14 1/32","h":"18","qty":2},{"w":"12 17/32","h":"18","qty":4},{"w":"9 17/32","h":"18","qty":1},{"w":"9 17/32","h":"15 7/16","qty":2},{"w":"18 17/32","h":"12 1/2","qty":1},{"w":"12 17/32","h":"9 7/16","qty":2},{"w":"24 9/16","h":"6 3/16","qty":4},{"w":"12 17/32","h":"4 9/16","qty":1},{"w":"24 9/16","h":"3 3/16","qty":2},{"w":"15 17/32","h":"3 3/16","qty":2},{"w":"14 1/32","h":"3 3/16","qty":2},{"w":"12 17/32","h":"3 3/16","qty":7},{"w":"9 17/32","h":"3 3/16","qty":1}];
+
+function renderSummary(container) {
+  const totalStiles = stileGroups.reduce((s,g) => s+g.qty, 0);
+  const totalRails = railGroups.reduce((s,g) => s+g.qty, 0);
+  const totalPanels = panelGroups.reduce((s,g) => s+g.qty, 0);
+
+  let html = `<div class="section-head"><div>
+    <span class="section-title" style="color:#f0f6fc">Grouped Quantities by Size</span>
+    <span class="section-sub">${totalStiles} stiles · ${totalRails} rails · ${totalPanels} panels = ${totalStiles+totalRails+totalPanels} total pieces</span>
+  </div></div>`;
+
+  // Stiles + Rails side by side
+  html += `<div class="summary-grid">`;
+
+  // Stiles table
+  html += `<table class="sum-table"><caption>Stiles — ¾" Maple (All 3" Wide)</caption>
+    <thead><tr><th>Length</th><th>Width</th><th>Qty</th></tr></thead><tbody>`;
+  stileGroups.forEach(g => {
+    html += `<tr><td>${g.l}"</td><td>${g.w}"</td><td class="qty-cell">${g.qty}</td></tr>`;
+  });
+  html += `</tbody><tfoot><tr><td>${stileGroups.length} sizes</td><td></td><td>${totalStiles}</td></tr></tfoot></table>`;
+
+  // Rails table
+  html += `<table class="sum-table"><caption>Rails — ¾" Maple (2" &amp; 3" Wide)</caption>
+    <thead><tr><th>Length</th><th>Width</th><th>Qty</th></tr></thead><tbody>`;
+  railGroups.forEach(g => {
+    html += `<tr><td>${g.l}"</td><td>${g.w}"</td><td class="qty-cell">${g.qty}</td></tr>`;
+  });
+  html += `</tbody><tfoot><tr><td>${railGroups.length} sizes</td><td></td><td>${totalRails}</td></tr></tfoot></table>`;
+
+  html += `</div>`;
+
+  // Panels table full width
+  html += `<div class="summary-panel-grid"><table class="sum-table"><caption class="panel-cap">Panels — ½" MDO</caption>
+    <thead><tr><th>Width</th><th>Height</th><th>Qty</th></tr></thead><tbody>`;
+  panelGroups.forEach(g => {
+    html += `<tr><td>${g.w}"</td><td>${g.h}"</td><td class="qty-cell">${g.qty}</td></tr>`;
+  });
+  html += `</tbody><tfoot><tr><td>${panelGroups.length} sizes</td><td></td><td>${totalPanels}</td></tr></tfoot></table></div>`;
+
+  container.innerHTML = html;
+}
+
 // Initial render
 renderLinearBoards(boards3, document.getElementById('tab-maple3'),
   '3" Wide Rips — Stiles & Door Rails', '120" stock', `2 rips per 8" board = ${Math.ceil(boards3.length/2)} boards`);
 renderLinearBoards(boards2, document.getElementById('tab-maple2'),
   '2" Wide Rips — Drawer Rails', '120" stock', `3 rips per 8" board = ${Math.ceil(boards2.length/3)} boards`);
 renderPanels(panelSheets, document.getElementById('tab-panels'));
+renderSummary(document.getElementById('tab-summary'));
 
 // Tab click delegation
 document.querySelectorAll('.tab-btn').forEach(btn => {
   btn.addEventListener('click', function() {
-    const id = this.textContent.includes('3"') ? 'maple3' : this.textContent.includes('2"') ? 'maple2' : 'panels';
+    const txt = this.textContent;
+    const id = txt.includes('3"') ? 'maple3' : txt.includes('2"') ? 'maple2' : txt.includes('Panel') ? 'panels' : 'summary';
     document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
     document.getElementById('tab-' + id).classList.add('active');
